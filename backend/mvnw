@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# MTANAV Maven Wrapper Script
+
+MAVEN_BIN="/home/mwalb/.m2/wrapper/dists/apache-maven-3.9.16-bin/5grr65jo27hi51sujmtcldfovl/apache-maven-3.9.16/bin/mvn"
+
+if [ -f "$MAVEN_BIN" ]; then
+    exec "$MAVEN_BIN" "$@"
+elif command -v mvn &> /dev/null; then
+    exec mvn "$@"
+else
+    echo "Locating Maven..."
+    FOUND_MVN=$(find /home/mwalb/.m2 /opt /usr -name "mvn" -type f 2>/dev/null | head -n 1)
+    if [ -n "$FOUND_MVN" ]; then
+        exec "$FOUND_MVN" "$@"
+    else
+        echo "Error: Maven not found on system. Please install maven or set PATH."
+        exit 1
+    fi
+fi

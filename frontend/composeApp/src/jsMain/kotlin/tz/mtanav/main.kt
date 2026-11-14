@@ -4,9 +4,13 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.CanvasBasedWindow
 import tz.mtanav.ui.map.LocationNavigator
 
+external fun onWasmReady(onReady: () -> Unit)
+
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    CanvasBasedWindow(title = "MTANAV", canvasElementId = "ComposeTarget") {
-        App(locationNavigator = LocationNavigator())
+    onWasmReady {
+        CanvasBasedWindow(title = "MTANAV", canvasElementId = "ComposeTarget") {
+            App(locationNavigator = LocationNavigator())
+        }
     }
 }

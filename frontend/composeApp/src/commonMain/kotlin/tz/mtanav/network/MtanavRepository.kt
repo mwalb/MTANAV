@@ -9,10 +9,11 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import tz.mtanav.config.ApiConfig
 import tz.mtanav.model.*
 import kotlin.math.*
 
-class MtanavRepository(private val baseUrl: String = "http://localhost:8080/api") {
+class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
 
     private val json = Json {
         ignoreUnknownKeys = true

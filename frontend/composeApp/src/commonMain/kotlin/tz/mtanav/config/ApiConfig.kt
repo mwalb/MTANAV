@@ -5,7 +5,7 @@ object ApiConfig {
      * Default Google Maps API Key for development.
      * Can be replaced or configured per build/environment.
      */
-    const val GOOGLE_MAPS_API_KEY = "AIzaSyAvna2gdB_NvFXsBGgY-WBnatqy9IKUN5s"
+    const val GOOGLE_MAPS_API_KEY = "AIzaSyA5iab9tz3f2SwVddSF3P7GFbbnaF9-tXk"
 
     /**
      * Default initial camera position (Dar es Salaam, Tanzania).
@@ -18,7 +18,7 @@ object ApiConfig {
      * Backend API Base URL.
      */
     fun getBaseUrl(): String {
-        return "http://localhost:8080/api"
+        return "https://mtanav.fly.dev/api"
     }
 
     /**

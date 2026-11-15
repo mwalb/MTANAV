@@ -21,6 +21,7 @@ class WebNativeMapController(
     private var jsMap: dynamic = null
     private val markersMap = mutableMapOf<Long, dynamic>()
     private var activeInfoWindow: dynamic = null
+    private var hoverInfoWindow: dynamic = null
     private var userLocationMarker: dynamic = null
     private var selectedBusinessId: Long? = null
 
@@ -49,6 +50,11 @@ class WebNativeMapController(
             })
         """)
         jsMap = mapObj
+
+        // Close info window when clicking on map background
+        mapObj.addListener("click", {
+            clearSelection()
+        })
 
         // Render user current location marker
         renderUserLocationMarker(lat, lng)
@@ -97,6 +103,8 @@ class WebNativeMapController(
         markersMap.clear()
         activeInfoWindow?.close()
         activeInfoWindow = null
+        hoverInfoWindow?.close()
+        hoverInfoWindow = null
         selectedBusinessId = null
     }
 
@@ -122,6 +130,7 @@ class WebNativeMapController(
             val bLat = business.latitude
             val bLng = business.longitude
             val bName = business.name
+            val displayName = bName.replace("Demo", "Vunjabei")
             val bId = business.id
             val bRating = business.rating
             val bReviews = business.reviewCount
@@ -137,13 +146,13 @@ class WebNativeMapController(
             } else ""
 
             val infoHtml = """
-                <div style="padding:8px; font-family:-apple-system, sans-serif; color:#24332F; max-width:240px;">
-                    <div style="font-weight:bold; font-size:14px; margin-bottom:2px;">$bName</div>
-                    <div style="color:#687773; font-size:12px; margin-bottom:4px;">⭐ $bRating ($bReviews) • $bAddress</div>
+                <div style="padding:8px 10px; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color:#1E293B; max-width:240px; border-radius:8px;">
+                    <div style="font-weight:800; font-size:14px; margin-bottom:2px; color:#0F172A;">$displayName</div>
+                    <div style="color:#64748B; font-size:12px; margin-bottom:4px;">⭐ $bRating ($bReviews) • $bAddress</div>
                     $matchHtml
                     <div style="display:flex; gap:6px; margin-top:8px;">
                         <button id="mtanav-btn-view-$bId" style="background-color:#176B65; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;">VIEW SHOP</button>
-                        <button id="mtanav-btn-nav-$bId" style="background-color:#E8AD4A; color:#124E4A; border:none; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;">NAVIGATE</button>
+                        <button id="mtanav-btn-nav-$bId" style="background-color:#EAB308; color:#1E293B; border:none; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;">NAVIGATE</button>
                     </div>
                 </div>
             """.trimIndent()
@@ -169,7 +178,7 @@ class WebNativeMapController(
                     new google.maps.Marker({
                         position: { lat: bLat, lng: bLng },
                         map: mapInstance,
-                        title: bName,
+                        title: displayName,
                         icon: {
                             path: google.maps.SymbolPath.CIRCLE,
                             scale: scaleVal,
@@ -183,7 +192,30 @@ class WebNativeMapController(
 
                 val infoWindow = js("new google.maps.InfoWindow({ content: infoHtml })")
 
+                // Hover interaction (desktop)
+                marker.addListener("mouseover", {
+                    if (activeInfoWindow != infoWindow && hoverInfoWindow != infoWindow) {
+                        hoverInfoWindow?.close()
+                        infoWindow.open(mapInstance, marker)
+                        hoverInfoWindow = infoWindow
+                    }
+                })
+
+                marker.addListener("mouseout", {
+                    if (hoverInfoWindow == infoWindow && selectedBusinessId != bId) {
+                        infoWindow.close()
+                        if (hoverInfoWindow == infoWindow) {
+                            hoverInfoWindow = null
+                        }
+                    }
+                })
+
+                // Click / Touch interaction
                 marker.addListener("click", {
+                    if (hoverInfoWindow != null) {
+                        hoverInfoWindow?.close()
+                        hoverInfoWindow = null
+                    }
                     activeInfoWindow?.close()
                     infoWindow.open(mapInstance, marker)
                     activeInfoWindow = infoWindow
@@ -261,6 +293,8 @@ class WebNativeMapController(
     override fun clearSelection() {
         activeInfoWindow?.close()
         activeInfoWindow = null
+        hoverInfoWindow?.close()
+        hoverInfoWindow = null
         selectedBusinessId = null
     }
 

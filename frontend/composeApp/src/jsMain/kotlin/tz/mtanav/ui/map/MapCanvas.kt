@@ -108,7 +108,6 @@ actual fun MapCanvas(
             mapUiManager.renderBusinessList(businesses, selectedBusiness)
             if (selectedBusiness != null) {
                 mapController.focusBusiness(selectedBusiness)
-                mapUiManager.showShopDetails(selectedBusiness)
             }
         }
     }

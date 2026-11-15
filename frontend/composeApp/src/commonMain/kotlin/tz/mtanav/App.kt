@@ -42,6 +42,7 @@ fun App(locationNavigator: LocationNavigator) {
 
     var currentScreen by remember { mutableStateOf<Screen>(Screen.HomeMap) }
     var cartItems by remember { mutableStateOf<List<CartItem>>(emptyList()) }
+    var showSplash by remember { mutableStateOf(true) }
 
     fun routeAfterAuth() {
         val user = repository.currentUser
@@ -60,7 +61,14 @@ fun App(locationNavigator: LocationNavigator) {
     }
 
     MtanavTheme {
-        when (val screen = currentScreen) {
+        if (showSplash) {
+            tz.mtanav.ui.components.SplashScreen(
+                onSplashFinished = {
+                    showSplash = false
+                }
+            )
+        } else {
+            when (val screen = currentScreen) {
             is Screen.HomeMap -> {
                 HomeMapScreen(
                     repository = repository,
@@ -324,4 +332,5 @@ fun App(locationNavigator: LocationNavigator) {
             }
         }
     }
+}
 }

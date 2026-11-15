@@ -49,7 +49,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                 customerId = 1,
                 customerName = "Juma Salum",
                 businessId = 1,
-                businessName = "Demo Household Shop (Kariakoo)",
+                businessName = "Vunjabei Household Shop (Kariakoo)",
                 orderStatus = "PENDING",
                 orderType = "DELIVERY",
                 totalAmount = 28000.0,
@@ -64,7 +64,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                 customerId = 1,
                 customerName = "Juma Salum",
                 businessId = 4,
-                businessName = "Demo Auto Garage & Car Wash (Mikocheni)",
+                businessName = "Vunjabei Auto Garage & Car Wash (Mikocheni)",
                 serviceId = 9,
                 serviceName = "Premium Car Wash & Detailing",
                 bookingStatus = "UPCOMING",
@@ -91,7 +91,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                     publicationStatus = "PUBLISHED",
                     posterId = 2,
                     businessId = 1,
-                    businessName = "Demo Household Shop (Kariakoo)",
+                    businessName = "Vunjabei Household Shop (Kariakoo)",
                     employmentType = "FULL_TIME",
                     payType = "MONTHLY",
                     payAmountMin = 300000.0,
@@ -115,7 +115,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                     publicationStatus = "PUBLISHED",
                     posterId = 2,
                     businessId = 2,
-                    businessName = "Demo Electronics Store (Mlimani)",
+                    businessName = "Vunjabei Electronics Store (Mlimani)",
                     employmentType = "FULL_TIME",
                     payType = "MONTHLY",
                     payAmountMin = 350000.0,
@@ -139,7 +139,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                     publicationStatus = "PUBLISHED",
                     posterId = 3,
                     businessId = 5,
-                    businessName = "Demo Printing & Tech Hub (Posta)",
+                    businessName = "Vunjabei Printing & Tech Hub (Posta)",
                     employmentType = "CONTRACT",
                     payType = "MONTHLY",
                     payAmountMin = 500000.0,
@@ -163,7 +163,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                     publicationStatus = "PUBLISHED",
                     posterId = 2,
                     businessId = 1,
-                    businessName = "Demo Household Shop (Kariakoo)",
+                    businessName = "Vunjabei Household Shop (Kariakoo)",
                     employmentType = "CASUAL",
                     payType = "DAILY",
                     payAmountMin = 20000.0,
@@ -184,7 +184,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                 PromotionDto(
                     id = 1,
                     businessId = 1,
-                    businessName = "Demo Household Shop (Kariakoo)",
+                    businessName = "Vunjabei Household Shop (Kariakoo)",
                     businessLatitude = -6.8182,
                     businessLongitude = 39.2778,
                     productId = 1,
@@ -207,7 +207,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                 PromotionDto(
                     id = 2,
                     businessId = 2,
-                    businessName = "Demo Electronics Store (Mlimani)",
+                    businessName = "Vunjabei Electronics Store (Mlimani)",
                     businessLatitude = -6.7725,
                     businessLongitude = 39.2215,
                     productId = 3,
@@ -230,7 +230,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                 PromotionDto(
                     id = 3,
                     businessId = 4,
-                    businessName = "Demo Auto Garage & Car Wash (Mikocheni)",
+                    businessName = "Vunjabei Auto Garage & Car Wash (Mikocheni)",
                     businessLatitude = -6.7580,
                     businessLongitude = 39.2450,
                     serviceId = 9,
@@ -405,9 +405,9 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
         // Businesses
         val businesses = listOf(
             SearchSuggestionDto(20, "Charger Shop (Posta Tech)", "BUSINESS", "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=500", null, 5, "Samora Tower, Posta, Dar es Salaam", "OPEN", 5),
-            SearchSuggestionDto(21, "Demo Electronics Store (Mlimani)", "BUSINESS", "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=500", null, 2, "Mlimani City Mall, Dar es Salaam", "OPEN", 2),
-            SearchSuggestionDto(22, "Demo Household Shop (Kariakoo)", "BUSINESS", "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=500", null, 1, "Swahili Street, Kariakoo, Dar es Salaam", "OPEN", 1),
-            SearchSuggestionDto(23, "Demo Auto Garage & Car Wash", "BUSINESS", "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500", null, 4, "Mikocheni B, Dar es Salaam", "OPEN", 4)
+            SearchSuggestionDto(21, "Vunjabei Electronics Store (Mlimani)", "BUSINESS", "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=500", null, 2, "Mlimani City Mall, Dar es Salaam", "OPEN", 2),
+            SearchSuggestionDto(22, "Vunjabei Household Shop (Kariakoo)", "BUSINESS", "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=500", null, 1, "Swahili Street, Kariakoo, Dar es Salaam", "OPEN", 1),
+            SearchSuggestionDto(23, "Vunjabei Auto Garage & Car Wash", "BUSINESS", "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500", null, 4, "Mikocheni B, Dar es Salaam", "OPEN", 4)
         )
 
         for (b in businesses) {
@@ -511,7 +511,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                     BusinessProductDto(
                         id = 1,
                         businessId = 1,
-                        businessName = "Demo Household Shop (Kariakoo)",
+                        businessName = "Vunjabei Household Shop (Kariakoo)",
                         productId = 1,
                         productName = "Stainless Steel Spoon",
                         productDescription = "High-grade 18/10 stainless steel dining spoon set. Rust resistant and dishwasher safe.",
@@ -530,7 +530,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                     BusinessProductDto(
                         id = 2,
                         businessId = 1,
-                        businessName = "Demo Household Shop (Kariakoo)",
+                        businessName = "Vunjabei Household Shop (Kariakoo)",
                         productId = 2,
                         productName = "Kyela Super Rice 5kg",
                         productDescription = "Aromatic grade 1 Kyela rice direct from Mbeya farms.",
@@ -549,7 +549,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                     BusinessProductDto(
                         id = 3,
                         businessId = businessId,
-                        businessName = if (businessId == 2L) "Demo Electronics Store (Mlimani)" else "Demo Printing & Tech Hub (Posta)",
+                        businessName = if (businessId == 2L) "Vunjabei Electronics Store (Mlimani)" else "Vunjabei Printing & Tech Hub (Posta)",
                         productId = 4,
                         productName = "Fast Charger",
                         productDescription = "High speed wall chargers & braided cables for smartphones and tablets.",
@@ -569,7 +569,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                     BusinessProductDto(
                         id = 4,
                         businessId = businessId,
-                        businessName = if (businessId == 2L) "Demo Electronics Store (Mlimani)" else "Demo Printing & Tech Hub (Posta)",
+                        businessName = if (businessId == 2L) "Vunjabei Electronics Store (Mlimani)" else "Vunjabei Printing & Tech Hub (Posta)",
                         productId = 3,
                         productName = "Smartphone Pro",
                         productDescription = "6.7-inch Super Retina display, 256GB storage, 5G enabled, triple lens camera.",
@@ -587,7 +587,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                     BusinessProductDto(
                         id = 5,
                         businessId = businessId,
-                        businessName = if (businessId == 3L) "Demo Kitchen & Hardware (Sinza)" else "Demo Footwear & Fashion (Kariakoo)",
+                        businessName = if (businessId == 3L) "Vunjabei Kitchen & Hardware (Sinza)" else "Vunjabei Footwear & Fashion (Kariakoo)",
                         productId = 5,
                         productName = "Genuine Leather Shoes",
                         productDescription = "Handcrafted genuine leather dress shoes for formal and casual occasions.",
@@ -620,7 +620,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                 BusinessServiceDto(
                     id = 1,
                     businessId = businessId,
-                    businessName = "Demo Business",
+                    businessName = "Vunjabei Business",
                     serviceId = 9,
                     serviceName = "Car Wash & Polish",
                     serviceIcon = "🚗",
@@ -795,7 +795,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
             customerId = currentUser?.id ?: 1,
             customerName = currentUser?.fullName ?: "Customer",
             businessId = first?.businessId ?: 1,
-            businessName = first?.businessName ?: "Demo Business",
+            businessName = first?.businessName ?: "Vunjabei Business",
             orderStatus = "PENDING",
             orderType = deliveryOption,
             totalAmount = total,
@@ -1360,7 +1360,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
         BusinessDto(
             id = 1,
             ownerId = 2,
-            name = "Demo Household Shop (Kariakoo)",
+            name = "Vunjabei Household Shop (Kariakoo)",
             description = "Kitchenware and household items",
             phone = "+255711000001",
             email = "info@demohousehold.co.tz",
@@ -1389,7 +1389,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
 
     private fun getFallbackAdminBusinesses(): List<BusinessDto> = listOf(
         BusinessDto(
-            id = 1, ownerId = 2, name = "Demo Household Shop (Kariakoo)", description = "Kitchenware shop",
+            id = 1, ownerId = 2, name = "Vunjabei Household Shop (Kariakoo)", description = "Kitchenware shop",
             phone = "+255711000001", email = "info@demohousehold.co.tz", verificationStatus = "VERIFIED",
             supportsDelivery = true, supportsPickup = true, latitude = -6.8182, longitude = 39.2778,
             address = "Swahili Street", city = "Dar es Salaam", region = "Ilala", buildingName = "Kariakoo Complex",
@@ -1397,7 +1397,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
             rating = 4.8, reviewCount = 42, paidPhotoAllowance = 0, imageUrls = listOf("https://picsum.photos/seed/shop1/600/400")
         ),
         BusinessDto(
-            id = 2, ownerId = 3, name = "Demo Electronics Store (Mlimani)", description = "Smartphones and accessories",
+            id = 2, ownerId = 3, name = "Vunjabei Electronics Store (Mlimani)", description = "Smartphones and accessories",
             phone = "+255711000002", email = "sales@demoelectronics.co.tz", verificationStatus = "VERIFIED",
             supportsDelivery = true, supportsPickup = true, latitude = -6.7725, longitude = 39.2215,
             address = "Mlimani Mall", city = "Dar es Salaam", region = "Ubungo", buildingName = "Mlimani Block B",
@@ -1427,13 +1427,13 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
         sort: SortOption?
     ): List<BusinessMapDto> {
         val allBusinesses = listOf(
-            BusinessMapDto(1, "Demo Household Shop (Kariakoo)", -6.8182, 39.2778, "Swahili Street / Aggrey", "Dar es Salaam", "Kariakoo Commercial Complex", "A-12", 4.8, 42, null, "Spoon", 2800.0),
-            BusinessMapDto(2, "Demo Electronics Store (Mlimani)", -6.7725, 39.2215, "Mlimani City Mall", "Dar es Salaam", "Mlimani Mall Block B", "B-104", 4.6, 28, null, "Phones", 2400000.0),
-            BusinessMapDto(3, "Demo Kitchen & Hardware (Sinza)", -6.7845, 39.2280, "Sinza Mori", "Dar es Salaam", "Mori Plaza", "Shop 5", 4.5, 19, null, "Shoes", 35000.0),
-            BusinessMapDto(4, "Demo Auto Garage & Car Wash (Mikocheni)", -6.7580, 39.2450, "Mikocheni B", "Dar es Salaam", "Mikocheni Auto Yard", "Yard 1", 4.7, 35, null, "Garage", 80000.0),
-            BusinessMapDto(5, "Demo Printing & Tech Hub (Posta)", -6.8150, 39.2880, "Posta Mpya", "Dar es Salaam", "Samora Tower", "204", 4.4, 15, null, "Phone Repair", 35000.0),
-            BusinessMapDto(6, "Demo Footwear & Fashion (Kariakoo)", -6.8190, 39.2760, "Msimbazi Street", "Dar es Salaam", "Kariakoo Plaza", "G-08", 4.8, 56, null, "Shoes", 45000.0),
-            BusinessMapDto(7, "Demo Beauty Salon & Spa (Kinondoni)", -6.7910, 39.2620, "Kinondoni Studio", "Dar es Salaam", "Studio Arcade", "Shop 2", 4.9, 64, null, "Salon", 25000.0)
+            BusinessMapDto(1, "Vunjabei Household Shop (Kariakoo)", -6.8182, 39.2778, "Swahili Street / Aggrey", "Dar es Salaam", "Kariakoo Commercial Complex", "A-12", 4.8, 42, null, "Spoon", 2800.0),
+            BusinessMapDto(2, "Vunjabei Electronics Store (Mlimani)", -6.7725, 39.2215, "Mlimani City Mall", "Dar es Salaam", "Mlimani Mall Block B", "B-104", 4.6, 28, null, "Phones", 2400000.0),
+            BusinessMapDto(3, "Vunjabei Kitchen & Hardware (Sinza)", -6.7845, 39.2280, "Sinza Mori", "Dar es Salaam", "Mori Plaza", "Shop 5", 4.5, 19, null, "Shoes", 35000.0),
+            BusinessMapDto(4, "Vunjabei Auto Garage & Car Wash (Mikocheni)", -6.7580, 39.2450, "Mikocheni B", "Dar es Salaam", "Mikocheni Auto Yard", "Yard 1", 4.7, 35, null, "Garage", 80000.0),
+            BusinessMapDto(5, "Vunjabei Printing & Tech Hub (Posta)", -6.8150, 39.2880, "Posta Mpya", "Dar es Salaam", "Samora Tower", "204", 4.4, 15, null, "Phone Repair", 35000.0),
+            BusinessMapDto(6, "Vunjabei Footwear & Fashion (Kariakoo)", -6.8190, 39.2760, "Msimbazi Street", "Dar es Salaam", "Kariakoo Plaza", "G-08", 4.8, 56, null, "Shoes", 45000.0),
+            BusinessMapDto(7, "Vunjabei Beauty Salon & Spa (Kinondoni)", -6.7910, 39.2620, "Kinondoni Studio", "Dar es Salaam", "Studio Arcade", "Shop 2", 4.9, 64, null, "Salon", 25000.0)
         )
 
         var filtered = when {

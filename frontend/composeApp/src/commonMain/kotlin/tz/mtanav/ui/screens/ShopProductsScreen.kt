@@ -64,7 +64,7 @@ fun ShopProductsScreen(
         allServices
     }
 
-    val shopName = businessInfo?.name ?: allProducts.firstOrNull()?.businessName ?: allServices.firstOrNull()?.businessName ?: "Demo Store"
+    val shopName = businessInfo?.name ?: allProducts.firstOrNull()?.businessName ?: allServices.firstOrNull()?.businessName ?: "Vunjabei Store"
     val shopAddress = businessInfo?.let { "${it.address}, ${it.city}" } ?: "Swahili Street, Kariakoo, Dar es Salaam"
     val shopPhone = businessInfo?.phone ?: "+255700000000"
     val shopLat = businessInfo?.latitude ?: -6.8182

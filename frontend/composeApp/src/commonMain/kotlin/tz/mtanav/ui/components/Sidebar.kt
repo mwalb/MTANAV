@@ -231,7 +231,14 @@ fun Sidebar(
                         }
 
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            if (currentUser.roles.contains("ROLE_BUSINESS_OWNER")) {
+                            if (currentUser.roles.contains("ROLE_SUPER_ADMIN") || currentUser.roles.contains("ROLE_ADMIN")) {
+                                TextButton(
+                                    onClick = onAdminDashboardRequested,
+                                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
+                                ) {
+                                    Text("Admin Portal", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = ErrorRed)
+                                }
+                            } else if (currentUser.roles.contains("ROLE_BUSINESS_OWNER") || currentUser.roles.contains("ROLE_OWNER")) {
                                 TextButton(
                                     onClick = onOwnerDashboardRequested,
                                     contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)

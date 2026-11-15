@@ -42,11 +42,10 @@ class MapUiManager(
         backdrop?.addEventListener("click", { closeDrawer() })
         sidebarClose?.addEventListener("click", { closeDrawer() })
 
-        // ESC Key listener to close drawer or shop details
+        // ESC Key listener to close drawer
         window.addEventListener("keydown", { event ->
             if (event is KeyboardEvent && event.key == "Escape") {
                 if (isDrawerOpen) closeDrawer()
-                hideShopDetails()
             }
         })
 
@@ -161,11 +160,6 @@ class MapUiManager(
             closeDrawer()
             onFilterApplied(null, null, null)
         })
-
-        // Shop details close button
-        document.getElementById("panel-close-btn")?.addEventListener("click", {
-            hideShopDetails()
-        })
     }
 
     fun setUser(user: UserDto?) {
@@ -234,9 +228,11 @@ class MapUiManager(
                 "<span style='font-size:11px; background:var(--light); color:var(--primary); padding:2px 6px; border-radius:4px; font-weight:700;'>⚙️ ${b.matchingService}</span>"
             } else ""
 
+            val displayName = b.name.replace("Demo", "Vunjabei")
+
             card.innerHTML = """
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div style="font-weight:700; font-size:14px; color:var(--text);">${b.name}</div>
+                    <div style="font-weight:700; font-size:14px; color:var(--text);">${displayName}</div>
                     <span style="font-size:12px; font-weight:700; color:#D97706;">⭐ ${b.rating}</span>
                 </div>
                 <div style="font-size:12px; color:var(--secondary-text);">${b.address} • ${b.city}</div>
@@ -246,76 +242,10 @@ class MapUiManager(
             card.addEventListener("click", {
                 selectedBusinessId = b.id
                 onBusinessSelected(b)
-                showShopDetails(b)
             })
 
             container.appendChild(card)
         }
-    }
-
-    fun showShopDetails(b: MapBusiness) {
-        val panel = document.getElementById("mtanav-shop-details-panel") ?: return
-        val nameEl = document.getElementById("panel-shop-name")
-        val addressEl = document.getElementById("panel-shop-address")
-        val ratingEl = document.getElementById("panel-shop-rating")
-        val descEl = document.getElementById("panel-shop-description")
-        val offeringsList = document.getElementById("panel-offerings-list")
-
-        val callBtn = document.getElementById("panel-btn-call") as? HTMLAnchorElement
-        val whatsappBtn = document.getElementById("panel-btn-whatsapp") as? HTMLAnchorElement
-        val navigateBtn = document.getElementById("panel-btn-navigate") as? HTMLAnchorElement
-        val messageBtn = document.getElementById("panel-btn-message") as? HTMLButtonElement
-
-        if (nameEl != null) nameEl.textContent = b.name
-        if (addressEl != null) addressEl.textContent = "${b.address}, ${b.city}"
-        if (ratingEl != null) ratingEl.textContent = "⭐ ${b.rating} (${b.reviewCount} reviews)"
-        if (descEl != null) descEl.textContent = "${b.name} is a verified business in ${b.city} registered on MTANAV."
-
-        // Configure Action Links
-        val rawPhone = b.phone ?: "+255700000000"
-        val cleanPhone = rawPhone.replace(Regex("[^0-9+]"), "")
-
-        if (callBtn != null) {
-            callBtn.href = "tel:$cleanPhone"
-        }
-
-        if (whatsappBtn != null) {
-            var waNum = cleanPhone.replace("+", "")
-            if (waNum.startsWith("0")) waNum = "255" + waNum.substring(1)
-            val encodedName = js("encodeURIComponent(b.name)")
-            whatsappBtn.href = "https://wa.me/$waNum?text=Hello%20$encodedName,%20I%20found%20your%20shop%20on%20MTANAV!"
-        }
-
-        if (navigateBtn != null) {
-            navigateBtn.href = "https://www.google.com/maps/dir/?api=1&destination=${b.latitude},${b.longitude}"
-        }
-
-        if (messageBtn != null) {
-            messageBtn.onclick = {
-                hideShopDetails()
-                onMessageShopOwner(b.id)
-            }
-        }
-
-        // Render offerings list
-        if (offeringsList != null) {
-            offeringsList.innerHTML = ""
-            val matchHtml = if (b.matchingProduct != null) {
-                "<div style='font-size:12px; background:#F1F5F9; padding:6px; border-radius:6px; font-weight:600;'>📦 Product: ${b.matchingProduct}${if (b.price != null) " (TZS ${b.price.toInt()})" else ""}</div>"
-            } else if (b.matchingService != null) {
-                "<div style='font-size:12px; background:#F1F5F9; padding:6px; border-radius:6px; font-weight:600;'>⚙️ Service: ${b.matchingService}</div>"
-            } else {
-                "<div style='font-size:12px; color:var(--secondary-text);'>Inquire directly with shop manager for full catalog.</div>"
-            }
-            offeringsList.innerHTML = matchHtml
-        }
-
-        panel.classList.add("visible")
-    }
-
-    fun hideShopDetails() {
-        val panel = document.getElementById("mtanav-shop-details-panel")
-        panel?.classList?.remove("visible")
     }
 
     fun showSuggestions(suggestions: List<SearchSuggestionDto>) {

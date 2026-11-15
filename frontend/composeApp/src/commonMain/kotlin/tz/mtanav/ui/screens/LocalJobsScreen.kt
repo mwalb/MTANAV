@@ -64,16 +64,15 @@ fun LocalJobsScreen(
         try {
             categories = listOf(
                 "All Categories",
-                "Delivery and logistics",
-                "Sales and marketing",
-                "Technology and IT",
-                "Repairs and technical work",
-                "Construction and trades",
-                "Hospitality and food services",
-                "Cleaning and household services",
-                "Retail and shop assistance",
-                "Office and administrative work",
-                "Temporary and casual work"
+                "Delivery & Logistics",
+                "Technology",
+                "Marketing",
+                "Sales",
+                "Hospitality",
+                "Repairs & Technical",
+                "Retail & Shop Assistance",
+                "Office & Admin",
+                "Casual & Temporary"
             )
         } catch (e: Exception) { /* ignored */ }
         fetchJobs()
@@ -121,35 +120,69 @@ fun LocalJobsScreen(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        OutlinedTextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            placeholder = { Text("Search by title, skill or keyword...", fontSize = 13.sp) },
-                            singleLine = true,
-                            modifier = Modifier.weight(1f),
-                            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Primary)
-                        )
+                    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                        val isNarrow = maxWidth < 600.dp
+                        if (isNarrow) {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                                OutlinedTextField(
+                                    value = searchQuery,
+                                    onValueChange = { searchQuery = it },
+                                    placeholder = { Text("Search by title, skill or keyword...", fontSize = 13.sp) },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Primary)
+                                )
 
-                        OutlinedTextField(
-                            value = locationQuery,
-                            onValueChange = { locationQuery = it },
-                            placeholder = { Text("Filter location...", fontSize = 13.sp) },
-                            singleLine = true,
-                            modifier = Modifier.weight(0.8f),
-                            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Primary)
-                        )
+                                OutlinedTextField(
+                                    value = locationQuery,
+                                    onValueChange = { locationQuery = it },
+                                    placeholder = { Text("Filter location...", fontSize = 13.sp) },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Primary)
+                                )
 
-                        Button(
-                            onClick = { fetchJobs() },
-                            colors = ButtonDefaults.buttonColors(containerColor = Action),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text("SEARCH JOBS", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                Button(
+                                    onClick = { fetchJobs() },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Action),
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text("SEARCH JOBS", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                }
+                            }
+                        } else {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                OutlinedTextField(
+                                    value = searchQuery,
+                                    onValueChange = { searchQuery = it },
+                                    placeholder = { Text("Search by title, skill or keyword...", fontSize = 13.sp) },
+                                    singleLine = true,
+                                    modifier = Modifier.weight(1f),
+                                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Primary)
+                                )
+
+                                OutlinedTextField(
+                                    value = locationQuery,
+                                    onValueChange = { locationQuery = it },
+                                    placeholder = { Text("Filter location...", fontSize = 13.sp) },
+                                    singleLine = true,
+                                    modifier = Modifier.weight(0.8f),
+                                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Primary)
+                                )
+
+                                Button(
+                                    onClick = { fetchJobs() },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Action),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text("SEARCH JOBS", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                }
+                            }
                         }
                     }
 
@@ -182,12 +215,23 @@ fun LocalJobsScreen(
                     }
 
                     // EMPLOYMENT TYPE CHIPS
-                    Row(
+                    FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Job Type:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
-                        listOf("All" to null, "Full Time" to "FULL_TIME", "Part Time" to "PART_TIME", "Contract" to "CONTRACT", "Casual" to "CASUAL").forEach { (label, type) ->
+                        Text("Job Type:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextSecondary, modifier = Modifier.align(Alignment.CenterVertically))
+                        val jobTypes = listOf(
+                            "All" to null,
+                            "Full-time" to "FULL_TIME",
+                            "Part-time" to "PART_TIME",
+                            "Contract" to "CONTRACT",
+                            "Temporary" to "TEMPORARY",
+                            "Internship" to "INTERNSHIP",
+                            "Freelance" to "FREELANCE",
+                            "Casual" to "CASUAL"
+                        )
+                        jobTypes.forEach { (label, type) ->
                             val isSel = selectedEmploymentType == type
                             Box(
                                 modifier = Modifier
@@ -198,7 +242,7 @@ fun LocalJobsScreen(
                                         selectedEmploymentType = type
                                         fetchJobs()
                                     }
-                                    .padding(horizontal = 10.dp, vertical = 4.dp)
+                                    .padding(horizontal = 10.dp, vertical = 5.dp)
                             ) {
                                 Text(label, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (isSel) Surface else TextPrimary)
                             }
@@ -237,7 +281,7 @@ fun LocalJobsScreen(
                         modifier = Modifier.fillMaxWidth().padding(32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("💼", fontSize = 36.sp)
+                        Icon(tz.mtanav.ui.components.MtanavIcons.Work, contentDescription = null, tint = Primary, modifier = Modifier.size(36.dp))
                         Spacer(modifier = Modifier.height(8.dp))
                         Text("No jobs found matching your criteria.", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
                         Text("Try adjusting your search terms or filters.", fontSize = 12.sp, color = TextSecondary)

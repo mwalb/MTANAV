@@ -31,44 +31,6 @@ actual fun MapCanvas(
     modifier: Modifier
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        if (activeFilterTitle != null) {
-            Surface(
-                shape = RoundedCornerShape(24.dp),
-                color = PrimaryDeepBlue,
-                shadowElevation = 6.dp,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("🔍", fontSize = 16.sp)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Showing: $activeFilterTitle",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = SurfaceWhite
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Surface(
-                        shape = CircleShape,
-                        color = HighlightGold
-                    ) {
-                        Text(
-                            text = "${businesses.size} found",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimary,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
-                        )
-                    }
-                }
-            }
-        }
-
         if (businesses.isEmpty()) {
             Card(
                 modifier = Modifier
@@ -83,7 +45,12 @@ actual fun MapCanvas(
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("🔍", fontSize = 48.sp)
+                    androidx.compose.material3.Icon(
+                        imageVector = tz.mtanav.ui.components.MtanavIcons.Search,
+                        contentDescription = null,
+                        tint = PrimaryDeepBlue,
+                        modifier = Modifier.size(48.dp)
+                    )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = "No businesses found in this area",

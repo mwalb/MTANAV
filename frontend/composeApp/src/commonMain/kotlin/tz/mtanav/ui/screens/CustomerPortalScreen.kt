@@ -4,7 +4,10 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -25,6 +28,7 @@ import tz.mtanav.ui.map.LocationNavigator
 enum class CustomerSection(val title: String) {
     Dashboard("Dashboard"),
     Discover("Discover"),
+    Messages("Messages & Inbox"),
     Orders("My Orders"),
     Bookings("My Bookings"),
     Cart("Cart & Checkout"),
@@ -44,6 +48,8 @@ fun CustomerPortalScreen(
     locationNavigator: LocationNavigator,
     cartItems: List<CartItem>,
     initialSection: CustomerSection = CustomerSection.Dashboard,
+    targetConversationId: Long? = null,
+    targetBusinessIdForMessage: Long? = null,
     onNavigateToPublicMap: () -> Unit,
     onLogoutClicked: () -> Unit,
     onCartUpdated: (List<CartItem>) -> Unit,
@@ -162,6 +168,12 @@ fun CustomerPortalScreen(
                         cartCount = cartItems.size,
                         onNavigateSection = { activeSection = it },
                         onExploreClick = onNavigateToPublicMap
+                    )
+
+                    CustomerSection.Messages -> CustomerMessagesContent(
+                        repository = repository,
+                        targetConversationId = targetConversationId,
+                        targetBusinessIdForMessage = targetBusinessIdForMessage
                     )
 
                     CustomerSection.Orders -> CustomerOrdersContent(
@@ -897,6 +909,343 @@ private fun CustomerSettingsContent() {
             Spacer(modifier = Modifier.height(12.dp))
             Text("• Order Notifications: Active")
             Text("• Location Permissions: Enabled for discovery")
+        }
+    }
+}
+
+// ==========================================
+// INTERNAL MESSAGING UI COMPONENTS
+// ==========================================
+
+@Composable
+private fun CustomerMessagesContent(
+    repository: MtanavRepository,
+    targetConversationId: Long? = null,
+    targetBusinessIdForMessage: Long? = null
+) {
+    var conversations by remember { mutableStateOf<List<ConversationDto>>(emptyList()) }
+    var selectedConversation by remember { mutableStateOf<ConversationDto?>(null) }
+    var messages by remember { mutableStateOf<List<MessageDto>>(emptyList()) }
+    var messageText by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var isSending by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
+    fun loadConversations() {
+        coroutineScope.launch {
+            isLoading = true
+            try {
+                if (targetBusinessIdForMessage != null) {
+                    val createdOrExisting = repository.startConversation(targetBusinessIdForMessage)
+                    selectedConversation = createdOrExisting
+                }
+
+                val list = repository.getConversations()
+                conversations = list
+
+                if (selectedConversation == null && list.isNotEmpty()) {
+                    selectedConversation = if (targetConversationId != null) {
+                        list.firstOrNull { it.id == targetConversationId } ?: list.first()
+                    } else {
+                        list.first()
+                    }
+                }
+
+                selectedConversation?.let { conv ->
+                    messages = repository.getMessages(conv.id)
+                    repository.markConversationRead(conv.id)
+                }
+            } catch (e: Exception) {
+                /* handled */
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    LaunchedEffect(targetConversationId, targetBusinessIdForMessage) {
+        loadConversations()
+    }
+
+    fun handleSendMessage() {
+        val conv = selectedConversation ?: return
+        if (messageText.isBlank()) return
+        val text = messageText.trim()
+        messageText = ""
+
+        coroutineScope.launch {
+            isSending = true
+            try {
+                repository.sendMessage(conv.id, text)
+                messages = repository.getMessages(conv.id)
+                val updatedList = repository.getConversations()
+                conversations = updatedList
+                selectedConversation = updatedList.firstOrNull { it.id == conv.id } ?: conv
+            } catch (e: Exception) {
+                /* handled */
+            } finally {
+                isSending = false
+            }
+        }
+    }
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 480.dp, max = 650.dp)
+    ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val isNarrow = maxWidth < 700.dp
+
+            if (isNarrow) {
+                if (selectedConversation == null || conversations.isEmpty()) {
+                    ConversationListPanel(
+                        conversations = conversations,
+                        selectedConversation = selectedConversation,
+                        isLoading = isLoading,
+                        onSelect = { conv ->
+                            selectedConversation = conv
+                            coroutineScope.launch {
+                                messages = repository.getMessages(conv.id)
+                                repository.markConversationRead(conv.id)
+                            }
+                        }
+                    )
+                } else {
+                    ChatMessageViewPanel(
+                        conversation = selectedConversation!!,
+                        messages = messages,
+                        messageText = messageText,
+                        isSending = isSending,
+                        onBackToList = { selectedConversation = null },
+                        onMessageTextChange = { messageText = it },
+                        onSend = { handleSendMessage() },
+                        isCustomer = true
+                    )
+                }
+            } else {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    Box(modifier = Modifier.weight(0.4f).fillMaxHeight()) {
+                        ConversationListPanel(
+                            conversations = conversations,
+                            selectedConversation = selectedConversation,
+                            isLoading = isLoading,
+                            onSelect = { conv ->
+                                selectedConversation = conv
+                                coroutineScope.launch {
+                                    messages = repository.getMessages(conv.id)
+                                    repository.markConversationRead(conv.id)
+                                }
+                            }
+                        )
+                    }
+
+                    VerticalDivider(color = Color(0xFFE2E8F0))
+
+                    Box(modifier = Modifier.weight(0.6f).fillMaxHeight()) {
+                        if (selectedConversation != null) {
+                            ChatMessageViewPanel(
+                                conversation = selectedConversation!!,
+                                messages = messages,
+                                messageText = messageText,
+                                isSending = isSending,
+                                onBackToList = null,
+                                onMessageTextChange = { messageText = it },
+                                onSend = { handleSendMessage() },
+                                isCustomer = true
+                            )
+                        } else {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("Select a conversation to start messaging.", color = TextSecondary, fontSize = 14.sp)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ConversationListPanel(
+    conversations: List<ConversationDto>,
+    selectedConversation: ConversationDto?,
+    isLoading: Boolean,
+    onSelect: (ConversationDto) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Text("CONVERSATIONS", fontSize = 14.sp, fontWeight = FontWeight.Black, color = PrimaryDeepBlue, letterSpacing = 1.sp)
+        Spacer(modifier = Modifier.height(12.dp))
+
+        if (isLoading) {
+            Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = ActionTeal, modifier = Modifier.size(24.dp))
+            }
+        } else if (conversations.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("✉️", fontSize = 32.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("No messages yet", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    Text("Visit a shop and click Message to inquire.", fontSize = 12.sp, color = TextSecondary)
+                }
+            }
+        } else {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxSize()) {
+                items(conversations) { conv ->
+                    val isSelected = selectedConversation?.id == conv.id
+                    val bg = if (isSelected) ActionTeal.copy(alpha = 0.12f) else AppBackground
+
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = bg,
+                        border = if (isSelected) BorderStroke(1.dp, ActionTeal) else null,
+                        modifier = Modifier.fillMaxWidth().clickable { onSelect(conv) }
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = conv.businessName ?: conv.customerName ?: "Chat #${conv.id}",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = TextPrimary
+                                )
+
+                                if (conv.unreadCount > 0) {
+                                    Surface(shape = CircleShape, color = ActionTeal) {
+                                        Text(
+                                            text = conv.unreadCount.toString(),
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Black,
+                                            color = SurfaceWhite,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                }
+                            }
+
+                            conv.lastMessageContent?.let { last ->
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = last,
+                                    fontSize = 12.sp,
+                                    color = TextSecondary,
+                                    maxLines = 1
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ChatMessageViewPanel(
+    conversation: ConversationDto,
+    messages: List<MessageDto>,
+    messageText: String,
+    isSending: Boolean,
+    onBackToList: (() -> Unit)?,
+    onMessageTextChange: (String) -> Unit,
+    onSend: () -> Unit,
+    isCustomer: Boolean
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        // CHAT HEADER
+        Surface(color = PrimaryDeepBlue, modifier = Modifier.fillMaxWidth()) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                if (onBackToList != null) {
+                    IconButton(onClick = onBackToList) {
+                        Icon(tz.mtanav.ui.components.MtanavIcons.ArrowBack, contentDescription = "Back", tint = SurfaceWhite)
+                    }
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = if (isCustomer) conversation.businessName ?: "Shop Owner" else conversation.customerName ?: "Customer",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = SurfaceWhite
+                    )
+                    Text(
+                        text = if (isCustomer) "Direct messaging with shop manager" else "Customer inquiry for ${conversation.businessName ?: "your shop"}",
+                        fontSize = 11.sp,
+                        color = HighlightGold
+                    )
+                }
+            }
+        }
+
+        // MESSAGES LIST
+        LazyColumn(
+            reverseLayout = true,
+            modifier = Modifier.weight(1f).fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(messages.reversed()) { msg ->
+                val isSelf = if (isCustomer) msg.senderRole == "CUSTOMER" else msg.senderRole == "SHOP_OWNER"
+                val align = if (isSelf) Alignment.CenterEnd else Alignment.CenterStart
+                val bubbleBg = if (isSelf) ActionTeal else PrimaryLight
+
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = align) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = bubbleBg,
+                        modifier = Modifier.widthIn(max = 280.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(10.dp)) {
+                            Text(
+                                text = msg.content,
+                                fontSize = 13.sp,
+                                color = if (isSelf) SurfaceWhite else TextPrimary
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = msg.senderName ?: (if (isSelf) "You" else "Recipient"),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isSelf) SurfaceWhite.copy(alpha = 0.75f) else TextSecondary
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // INPUT BAR
+        Surface(color = SurfaceWhite, shadowElevation = 8.dp, modifier = Modifier.fillMaxWidth()) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(12.dp)
+            ) {
+                OutlinedTextField(
+                    value = messageText,
+                    onValueChange = onMessageTextChange,
+                    placeholder = { Text("Type your message...", fontSize = 13.sp) },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = ActionTeal)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = onSend,
+                    enabled = messageText.isNotBlank() && !isSending,
+                    colors = ButtonDefaults.buttonColors(containerColor = ActionTeal),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp)
+                ) {
+                    Text(if (isSending) "..." else "SEND", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                }
+            }
         }
     }
 }

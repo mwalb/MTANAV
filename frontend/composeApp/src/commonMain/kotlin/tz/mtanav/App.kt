@@ -10,8 +10,8 @@ import tz.mtanav.ui.screens.*
 
 sealed class Screen {
     data object HomeMap : Screen()
-    data object Login : Screen()
-    data object Register : Screen()
+    data class Login(val targetScreenAfterAuth: Screen? = null) : Screen()
+    data class Register(val targetScreenAfterAuth: Screen? = null) : Screen()
     data object BusinessRegistration : Screen()
     data class ShopProducts(
         val businessId: Long,
@@ -20,8 +20,15 @@ sealed class Screen {
     ) : Screen()
     data class ProductDetails(val product: BusinessProductDto) : Screen()
     data class CartCheckout(val items: List<CartItem>) : Screen()
-    data class OwnerPortal(val initialSection: OwnerSection = OwnerSection.Dashboard) : Screen()
-    data class CustomerPortal(val initialSection: CustomerSection = CustomerSection.Dashboard) : Screen()
+    data class OwnerPortal(
+        val initialSection: OwnerSection = OwnerSection.Dashboard,
+        val targetConversationId: Long? = null
+    ) : Screen()
+    data class CustomerPortal(
+        val initialSection: CustomerSection = CustomerSection.Dashboard,
+        val targetConversationId: Long? = null,
+        val targetBusinessIdForMessage: Long? = null
+    ) : Screen()
     data object AdminDashboard : Screen()
     data object LocalJobs : Screen()
     data class JobDetails(val jobId: Long) : Screen()
@@ -75,7 +82,7 @@ fun App(locationNavigator: LocationNavigator) {
                         currentScreen = Screen.AdminDashboard
                     },
                     onAuthRequested = {
-                        currentScreen = Screen.Login
+                        currentScreen = Screen.Login()
                     },
                     onOpenJobsRequested = {
                         currentScreen = Screen.LocalJobs
@@ -84,7 +91,18 @@ fun App(locationNavigator: LocationNavigator) {
                         currentScreen = Screen.Promotions
                     },
                     onOpenEarnRequested = {
-                        currentScreen = Screen.CustomerPortal(CustomerSection.Earn)
+                        if (repository.currentUser == null) {
+                            currentScreen = Screen.Login(targetScreenAfterAuth = Screen.CustomerPortal(CustomerSection.Earn))
+                        } else {
+                            currentScreen = Screen.CustomerPortal(CustomerSection.Earn)
+                        }
+                    },
+                    onRegisterBusinessRequested = {
+                        if (repository.currentUser == null) {
+                            currentScreen = Screen.Login(targetScreenAfterAuth = Screen.BusinessRegistration)
+                        } else {
+                            currentScreen = Screen.BusinessRegistration
+                        }
                     }
                 )
             }
@@ -104,7 +122,7 @@ fun App(locationNavigator: LocationNavigator) {
                     jobId = screen.jobId,
                     repository = repository,
                     onBackClicked = { currentScreen = Screen.LocalJobs },
-                    onAuthRequested = { currentScreen = Screen.Login },
+                    onAuthRequested = { currentScreen = Screen.Login() },
                     onApplicationSubmitted = {
                         currentScreen = Screen.CustomerPortal(CustomerSection.Jobs)
                     }
@@ -141,17 +159,21 @@ fun App(locationNavigator: LocationNavigator) {
                             selectedServiceId = serviceId
                         )
                     },
-                    onAuthRequested = { currentScreen = Screen.Login }
+                    onAuthRequested = { currentScreen = Screen.Login() }
                 )
             }
 
             is Screen.Login -> {
                 LoginScreen(
                     onLoginSuccess = {
-                        routeAfterAuth()
+                        if (screen.targetScreenAfterAuth != null) {
+                            currentScreen = screen.targetScreenAfterAuth
+                        } else {
+                            routeAfterAuth()
+                        }
                     },
                     onRegisterClicked = {
-                        currentScreen = Screen.Register
+                        currentScreen = Screen.Register(targetScreenAfterAuth = screen.targetScreenAfterAuth)
                     },
                     onBackClicked = {
                         currentScreen = Screen.HomeMap
@@ -166,16 +188,20 @@ fun App(locationNavigator: LocationNavigator) {
             is Screen.Register -> {
                 RegisterScreen(
                     onCustomerRegistered = {
-                        currentScreen = Screen.CustomerPortal()
+                        if (screen.targetScreenAfterAuth != null) {
+                            currentScreen = screen.targetScreenAfterAuth
+                        } else {
+                            currentScreen = Screen.CustomerPortal()
+                        }
                     },
                     onBusinessOwnerRegistered = {
                         currentScreen = Screen.BusinessRegistration
                     },
                     onLoginClicked = {
-                        currentScreen = Screen.Login
+                        currentScreen = Screen.Login(targetScreenAfterAuth = screen.targetScreenAfterAuth)
                     },
                     onBackClicked = {
-                        currentScreen = Screen.Login
+                        currentScreen = Screen.Login(targetScreenAfterAuth = screen.targetScreenAfterAuth)
                     },
                     onRegisterSubmit = { email, password, fullName, phone, role ->
                         repository.register(
@@ -199,7 +225,7 @@ fun App(locationNavigator: LocationNavigator) {
                         currentScreen = Screen.OwnerPortal()
                     },
                     onBackClicked = {
-                        currentScreen = Screen.Register
+                        currentScreen = Screen.Register()
                     }
                 )
             }
@@ -214,6 +240,21 @@ fun App(locationNavigator: LocationNavigator) {
                     onBackClicked = { currentScreen = Screen.HomeMap },
                     onProductSelected = { product ->
                         currentScreen = Screen.ProductDetails(product)
+                    },
+                    onMessageShopOwnerClicked = { bId ->
+                        if (repository.currentUser == null) {
+                            currentScreen = Screen.Login(
+                                targetScreenAfterAuth = Screen.CustomerPortal(
+                                    initialSection = CustomerSection.Messages,
+                                    targetBusinessIdForMessage = bId
+                                )
+                            )
+                        } else {
+                            currentScreen = Screen.CustomerPortal(
+                                initialSection = CustomerSection.Messages,
+                                targetBusinessIdForMessage = bId
+                            )
+                        }
                     }
                 )
             }
@@ -245,6 +286,7 @@ fun App(locationNavigator: LocationNavigator) {
                 OwnerPortalScreen(
                     repository = repository,
                     initialSection = screen.initialSection,
+                    targetConversationId = screen.targetConversationId,
                     onNavigateToPublicMap = { currentScreen = Screen.HomeMap },
                     onLogoutClicked = {
                         repository.authToken = null
@@ -260,6 +302,8 @@ fun App(locationNavigator: LocationNavigator) {
                     locationNavigator = locationNavigator,
                     cartItems = cartItems,
                     initialSection = screen.initialSection,
+                    targetConversationId = screen.targetConversationId,
+                    targetBusinessIdForMessage = screen.targetBusinessIdForMessage,
                     onNavigateToPublicMap = { currentScreen = Screen.HomeMap },
                     onLogoutClicked = {
                         repository.authToken = null

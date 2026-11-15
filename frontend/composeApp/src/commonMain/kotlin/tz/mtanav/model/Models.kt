@@ -373,3 +373,40 @@ data class SearchSuggestionDto(
     val targetId: Long? = null
 )
 
+@Serializable
+data class ConversationDto(
+    val id: Long,
+    val customerId: Long,
+    val customerName: String? = null,
+    val businessId: Long,
+    val businessName: String? = null,
+    val shopOwnerId: Long,
+    val shopOwnerName: String? = null,
+    val lastMessageContent: String? = null,
+    val lastMessageAt: String? = null,
+    val unreadCount: Long = 0,
+    val createdAt: String? = null
+)
+
+@Serializable
+data class MessageDto(
+    val id: Long,
+    val conversationId: Long,
+    val senderId: Long,
+    val senderName: String? = null,
+    val senderRole: String? = null, // "CUSTOMER" or "SHOP_OWNER"
+    val content: String,
+    val isRead: Boolean = false,
+    val createdAt: String? = null
+)
+
+@Serializable
+data class CreateConversationRequest(
+    val businessId: Long,
+    val initialMessage: String? = null
+)
+
+@Serializable
+data class SendMessageRequest(
+    val content: String
+)

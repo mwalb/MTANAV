@@ -25,12 +25,15 @@ public class EarnController {
         if (auth != null && auth.getPrincipal() instanceof UserPrincipal) {
             return ((UserPrincipal) auth.getPrincipal()).getId();
         }
-        return 1L; // fallback demo user
+        return null;
     }
 
     @GetMapping("/dashboard")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getDashboard(Authentication authentication) {
         Long userId = getUserId(authentication);
+        if (userId == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("Authentication required to access earning dashboard"));
+        }
         BigDecimal availableBalance = earnService.getAvailableBalance(userId);
         List<ReferralLink> links = earnService.getReferralLinks(userId);
         List<Commission> commissions = earnService.getCommissions(userId);
@@ -50,6 +53,9 @@ public class EarnController {
     @GetMapping("/links")
     public ResponseEntity<ApiResponse<List<ReferralLink>>> getLinks(Authentication authentication) {
         Long userId = getUserId(authentication);
+        if (userId == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("Authentication required"));
+        }
         return ResponseEntity.ok(ApiResponse.success(earnService.getReferralLinks(userId), "Referral links retrieved"));
     }
 
@@ -60,6 +66,9 @@ public class EarnController {
             Authentication authentication
     ) {
         Long userId = getUserId(authentication);
+        if (userId == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("Authentication required"));
+        }
         ReferralLink link = earnService.createReferralLink(userId, targetType, targetId);
         return ResponseEntity.ok(ApiResponse.success(link, "Referral link created successfully"));
     }
@@ -67,6 +76,9 @@ public class EarnController {
     @GetMapping("/commissions")
     public ResponseEntity<ApiResponse<List<Commission>>> getCommissions(Authentication authentication) {
         Long userId = getUserId(authentication);
+        if (userId == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("Authentication required"));
+        }
         return ResponseEntity.ok(ApiResponse.success(earnService.getCommissions(userId), "Commissions retrieved"));
     }
 }

@@ -118,26 +118,51 @@ fun PromotionsScreen(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        OutlinedTextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            placeholder = { Text("Search offers by product, service or business...", fontSize = 13.sp) },
-                            singleLine = true,
-                            modifier = Modifier.weight(1f),
-                            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Primary)
-                        )
+                    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                        val isNarrow = maxWidth < 600.dp
+                        if (isNarrow) {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                                OutlinedTextField(
+                                    value = searchQuery,
+                                    onValueChange = { searchQuery = it },
+                                    placeholder = { Text("Search offers by product, service or business...", fontSize = 13.sp) },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Primary)
+                                )
 
-                        Button(
-                            onClick = { fetchPromotions() },
-                            colors = ButtonDefaults.buttonColors(containerColor = Action),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text("SEARCH OFFERS", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                Button(
+                                    onClick = { fetchPromotions() },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Action),
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text("SEARCH OFFERS", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                }
+                            }
+                        } else {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                OutlinedTextField(
+                                    value = searchQuery,
+                                    onValueChange = { searchQuery = it },
+                                    placeholder = { Text("Search offers by product, service or business...", fontSize = 13.sp) },
+                                    singleLine = true,
+                                    modifier = Modifier.weight(1f),
+                                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Primary)
+                                )
+
+                                Button(
+                                    onClick = { fetchPromotions() },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Action),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text("SEARCH OFFERS", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                }
+                            }
                         }
                     }
 
@@ -224,7 +249,7 @@ fun PromotionsScreen(
                         modifier = Modifier.fillMaxWidth().padding(32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("🏷️", fontSize = 36.sp)
+                        Icon(tz.mtanav.ui.components.MtanavIcons.LocalOffer, contentDescription = null, tint = Action, modifier = Modifier.size(36.dp))
                         Spacer(modifier = Modifier.height(8.dp))
                         Text("No active promotions matching your filter.", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
                         Text("Check back soon for new offers from verified shops.", fontSize = 12.sp, color = TextSecondary)

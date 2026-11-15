@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -61,24 +62,31 @@ fun Sidebar(
     onOpenJobsRequested: () -> Unit = {},
     onOpenPromotionsRequested: () -> Unit = {},
     onOpenEarnRequested: () -> Unit = {},
+    onRegisterBusinessRequested: () -> Unit = {},
+    onCloseDrawerRequested: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
             .fillMaxHeight()
+            .widthIn(max = 380.dp)
+            .fillMaxWidth()
             .background(SurfaceWhite)
     ) {
-        // TOP SECTION: MTANAV Brand Gradient Background (#123B6D to #2563A6)
+        // MAIN SCROLLABLE BODY (TOP/MIDDLE): Deep Teal (#136A63) to Vibrant Medium Blue (#1679C5) Gradient
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
                 .background(
                     brush = Brush.verticalGradient(
-                        colors = listOf(PrimaryDeepBlue, PrimaryBlue)
+                        colors = listOf(
+                            Color(0xFF136A63),
+                            Color(0xFF1679C5)
+                        )
                     )
                 )
-                .padding(16.dp)
+                .padding(horizontal = 20.dp, vertical = 20.dp)
                 .verticalScroll(rememberScrollState())
         ) {
             when (sidebarMode) {
@@ -93,7 +101,8 @@ fun Sidebar(
                         onExploreAllServicesClicked = { onModeChange(SidebarMode.AllServices) },
                         onOpenJobsRequested = onOpenJobsRequested,
                         onOpenPromotionsRequested = onOpenPromotionsRequested,
-                        onOpenEarnRequested = onOpenEarnRequested
+                        onOpenEarnRequested = onOpenEarnRequested,
+                        onCloseDrawerRequested = onCloseDrawerRequested
                     )
                 }
 
@@ -103,7 +112,8 @@ fun Sidebar(
                         onProductSearchQueryChange = onProductSearchQueryChange,
                         allProducts = allProducts,
                         onProductSelected = onProductSelected,
-                        onBackClicked = onBackClicked
+                        onBackClicked = onBackClicked,
+                        onCloseDrawerRequested = onCloseDrawerRequested
                     )
                 }
 
@@ -113,7 +123,8 @@ fun Sidebar(
                         onServiceSearchQueryChange = onServiceSearchQueryChange,
                         allServices = allServices,
                         onServiceSelected = onServiceSelected,
-                        onBackClicked = onBackClicked
+                        onBackClicked = onBackClicked,
+                        onCloseDrawerRequested = onCloseDrawerRequested
                     )
                 }
 
@@ -128,7 +139,8 @@ fun Sidebar(
                         error = error,
                         onApplyFilter = onApplyFilter,
                         onClearFilters = onClearFilters,
-                        onBackClicked = onBackClicked
+                        onBackClicked = onBackClicked,
+                        onCloseDrawerRequested = onCloseDrawerRequested
                     )
                 }
 
@@ -143,7 +155,8 @@ fun Sidebar(
                         error = error,
                         onApplyFilter = onApplyFilter,
                         onClearFilters = onClearFilters,
-                        onBackClicked = onBackClicked
+                        onBackClicked = onBackClicked,
+                        onCloseDrawerRequested = onCloseDrawerRequested
                     )
                 }
 
@@ -158,108 +171,88 @@ fun Sidebar(
                         error = error,
                         onApplyFilter = onApplyFilter,
                         onClearFilters = onClearFilters,
-                        onBackClicked = onBackClicked
+                        onBackClicked = onBackClicked,
+                        onCloseDrawerRequested = onCloseDrawerRequested
                     )
                 }
             }
         }
 
-        // BOTTOM SECTION: WHITE Background (#FFFFFF)
+        // STICKY BOTTOM FOOTER: Solid White (#FFFFFF) with subtle top border (#E5E7EB) and 16px 20px padding
         Surface(
-            color = SurfaceWhite,
-            shadowElevation = 8.dp,
+            color = Color(0xFFFFFFFF),
+            border = BorderStroke(1.dp, Color(0xFFE5E7EB)),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
-                HorizontalDivider(color = Color(0xFFE2E8F0), modifier = Modifier.padding(bottom = 12.dp))
+                Button(
+                    onClick = onRegisterBusinessRequested,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(46.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF12695C),
+                        contentColor = Color(0xFFFFFFFF)
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = "REGISTER PRODUCT OR SERVICE",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFFFFFFF),
+                        letterSpacing = 0.52.sp
+                    )
+                }
 
-                if (currentUser == null) {
-                    Button(
-                        onClick = onAuthRequested,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryDeepBlue),
-                        shape = RoundedCornerShape(8.dp)
+                if (currentUser != null) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("REGISTER PRODUCT OR SERVICE", color = SurfaceWhite, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    }
-                } else {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column {
-                                Text(
-                                    text = currentUser.fullName,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = TextPrimary
-                                )
-                                Text(
-                                    text = currentUser.email,
-                                    fontSize = 11.sp,
-                                    color = TextSecondary
-                                )
-                            }
-
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = ActionTeal.copy(alpha = 0.12f)
-                            ) {
-                                Text(
-                                    text = if (currentUser.roles.contains("ROLE_SUPER_ADMIN")) "SUPER ADMIN"
-                                    else if (currentUser.roles.contains("ROLE_ADMIN")) "ADMIN"
-                                    else if (currentUser.roles.contains("ROLE_BUSINESS_OWNER")) "OWNER"
-                                    else "CLIENT",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = ActionTeal,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                )
-                            }
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = currentUser.fullName,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
+                            Text(
+                                text = currentUser.email,
+                                fontSize = 11.sp,
+                                color = TextSecondary
+                            )
                         }
 
-                        if (currentUser.roles.contains("ROLE_BUSINESS_OWNER")) {
-                            Button(
-                                onClick = onOwnerDashboardRequested,
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryDeepBlue),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Text("Owner Dashboard", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            if (currentUser.roles.contains("ROLE_BUSINESS_OWNER")) {
+                                TextButton(
+                                    onClick = onOwnerDashboardRequested,
+                                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
+                                ) {
+                                    Text("Owner Portal", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PrimaryDeepBlue)
+                                }
+                            } else {
+                                TextButton(
+                                    onClick = onCustomerPortalRequested,
+                                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
+                                ) {
+                                    Text("My Portal", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = ActionTeal)
+                                }
                             }
-                        } else {
-                            Button(
-                                onClick = onCustomerPortalRequested,
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = ActionTeal),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Text("Customer Portal", fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                            }
-                        }
 
-                        if (currentUser.roles.contains("ROLE_ADMIN") || currentUser.roles.contains("ROLE_SUPER_ADMIN")) {
-                            Button(
-                                onClick = onAdminDashboardRequested,
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryDeepBlue),
-                                shape = RoundedCornerShape(8.dp)
+                            TextButton(
+                                onClick = onLogoutRequested,
+                                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
                             ) {
-                                Text("Admin Panel", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                Text("Sign out", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = ErrorRed)
                             }
-                        }
-
-                        TextButton(
-                            onClick = onLogoutRequested,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Sign out", color = ErrorRed, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -273,6 +266,61 @@ fun Sidebar(
 // ==========================================
 
 @Composable
+private fun ExploreCategoryCard(
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
+    hasGoldBorder: Boolean = false
+) {
+    val bgColor = Color(0xFFFFFFFF).copy(alpha = 0.14f)
+    val borderStroke = if (hasGoldBorder) {
+        BorderStroke(1.5.dp, Color(0xFFEAB308))
+    } else {
+        BorderStroke(1.dp, Color(0xFFFFFFFF).copy(alpha = 0.15f))
+    }
+    val chevronColor = if (hasGoldBorder) Color(0xFFEAB308) else Color(0xFFFFFFFF).copy(alpha = 0.75f)
+
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = bgColor,
+        border = borderStroke,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFFFFFFF)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = subtitle,
+                    fontSize = 12.5.sp,
+                    color = Color(0xFFFFFFFF).copy(alpha = 0.85f),
+                    lineHeight = 16.sp
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = "›",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = chevronColor
+            )
+        }
+    }
+}
+
+@Composable
 private fun ExploreTopContent(
     searchQuery: String,
     repository: MtanavRepository,
@@ -283,7 +331,8 @@ private fun ExploreTopContent(
     onExploreAllServicesClicked: () -> Unit,
     onOpenJobsRequested: () -> Unit,
     onOpenPromotionsRequested: () -> Unit,
-    onOpenEarnRequested: () -> Unit
+    onOpenEarnRequested: () -> Unit,
+    onCloseDrawerRequested: (() -> Unit)? = null
 ) {
     var suggestions by remember { mutableStateOf<List<SearchSuggestionDto>>(emptyList()) }
     var isSuggestionsLoading by remember { mutableStateOf(false) }
@@ -306,47 +355,93 @@ private fun ExploreTopContent(
     }
 
     // Brand Header
-    Column(modifier = Modifier.padding(bottom = 12.dp)) {
-        Text(
-            text = "MTANAV",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Black,
-            color = SurfaceWhite,
-            letterSpacing = 1.sp
-        )
-        Text(
-            text = "Find it. Get there. Earn with it.",
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            color = HighlightGold
-        )
+    Row(
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth().padding(bottom = 18.dp)
+    ) {
+        Column {
+            Text(
+                text = "MTANAV",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Black,
+                color = Color(0xFFFFFFFF),
+                letterSpacing = (-0.5).sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Find it. Get there. Earn with it.",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFFEAB308)
+            )
+        }
+
+        onCloseDrawerRequested?.let { onClose ->
+            Surface(
+                shape = CircleShape,
+                color = Color.White.copy(alpha = 0.2f),
+                modifier = Modifier.size(34.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    IconButton(onClick = onClose, modifier = Modifier.size(34.dp)) {
+                        Icon(
+                            imageVector = MtanavIcons.Close,
+                            contentDescription = "Close Menu",
+                            tint = Color.White,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
+        }
     }
 
     // Search Field
     Surface(
-        shape = RoundedCornerShape(10.dp),
-        color = SurfaceWhite,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+        shape = RoundedCornerShape(12.dp),
+        color = Color(0xFFFFFFFF),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
         ) {
-            OutlinedTextField(
+            Icon(
+                imageVector = MtanavIcons.Search,
+                contentDescription = null,
+                tint = Color(0xFF6B7280),
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            androidx.compose.foundation.text.BasicTextField(
                 value = searchQuery,
                 onValueChange = onSearchQueryChange,
-                placeholder = { Text("Find products, shops, services or jobs...", fontSize = 13.sp, color = TextSecondary) },
-                modifier = Modifier.weight(1f),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = {
                     showSuggestions = false
                     onSearchSubmitted()
                 }),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent
-                )
+                textStyle = LocalTextStyle.current.copy(
+                    fontSize = 13.sp,
+                    color = TextPrimary
+                ),
+                decorationBox = { innerTextField ->
+                    if (searchQuery.isEmpty()) {
+                        Text(
+                            text = "Find products, shops, services or jobs...",
+                            fontSize = 13.sp,
+                            color = Color(0xFF6B7280)
+                        )
+                    }
+                    innerTextField()
+                },
+                modifier = Modifier.weight(1f)
             )
             if (searchQuery.isNotBlank()) {
                 IconButton(
@@ -354,9 +449,14 @@ private fun ExploreTopContent(
                         showSuggestions = false
                         onSearchSubmitted()
                     },
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(28.dp)
                 ) {
-                    Text("➔", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = PrimaryDeepBlue)
+                    Icon(
+                        imageVector = MtanavIcons.Close,
+                        contentDescription = "Clear search",
+                        tint = Color(0xFF6B7280),
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
             }
         }
@@ -389,7 +489,12 @@ private fun ExploreTopContent(
                         onClick = { showSuggestions = false },
                         modifier = Modifier.size(20.dp)
                     ) {
-                        Text("✕", fontSize = 11.sp, color = TextSecondary)
+                        Icon(
+                            imageVector = MtanavIcons.Close,
+                            contentDescription = "Close suggestions",
+                            tint = TextSecondary,
+                            modifier = Modifier.size(16.dp)
+                        )
                     }
                 }
 
@@ -439,81 +544,71 @@ private fun ExploreTopContent(
                         }
                         .padding(horizontal = 10.dp, vertical = 8.dp)
                 ) {
-                    Text(
-                        text = "🔍 View all results for \"${searchQuery.trim()}\"",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = PrimaryDeepBlue
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = MtanavIcons.Search,
+                            contentDescription = null,
+                            tint = PrimaryDeepBlue,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "View all results for \"${searchQuery.trim()}\"",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PrimaryDeepBlue
+                        )
+                    }
+                    Icon(
+                        imageVector = MtanavIcons.ArrowForward,
+                        contentDescription = null,
+                        tint = PrimaryDeepBlue,
+                        modifier = Modifier.size(14.dp)
                     )
-                    Text("➔", fontSize = 12.sp, color = PrimaryDeepBlue, fontWeight = FontWeight.Bold)
                 }
             }
         }
     }
 
-    Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(24.dp))
 
-    // EXPLORE CATEGORIES SECTION
+    // DISCOVERY CATEGORIES SECTION HEADER
     Text(
         text = "DISCOVERY CATEGORIES",
-        fontSize = 11.sp,
+        fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
-        color = SurfaceWhite.copy(alpha = 0.7f),
-        letterSpacing = 1.2.sp
+        color = Color(0xBFFFFFFF),
+        letterSpacing = 0.72.sp
     )
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(12.dp))
 
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        TextNavigationTile(
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        ExploreCategoryCard(
             title = "Products",
             subtitle = "Spoons, rice, phones, chargers, shoes & more",
             onClick = onExploreAllProductsClicked
         )
-        TextNavigationTile(
+        ExploreCategoryCard(
             title = "Services",
             subtitle = "Garage, car wash, salon, phone repair & banking",
             onClick = onExploreAllServicesClicked
         )
-        TextNavigationTile(
+        ExploreCategoryCard(
             title = "Local Jobs",
             subtitle = "Delivery, sales, technical, trade & casual work",
             onClick = onOpenJobsRequested
         )
-        TextNavigationTile(
+        ExploreCategoryCard(
             title = "Promotions",
             subtitle = "Discounts, flash sales & genuine deals",
             onClick = onOpenPromotionsRequested
         )
-    }
-
-    Spacer(modifier = Modifier.height(14.dp))
-
-    // SECONDARY ENTRY: WANT TO EARN WITH MTANAV
-    Surface(
-        shape = RoundedCornerShape(8.dp),
-        color = HighlightGold.copy(alpha = 0.2f),
-        border = BorderStroke(1.dp, HighlightGold),
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onOpenEarnRequested)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Want to earn with MTANAV?",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = SurfaceWhite
-                )
-                Text(
-                    text = "Referrals, creator promotions & rewards",
-                    fontSize = 11.sp,
-                    color = SurfaceWhite.copy(alpha = 0.8f)
-                )
-            }
-            Text("➔", fontSize = 12.sp, color = HighlightGold, fontWeight = FontWeight.Bold)
-        }
+        ExploreCategoryCard(
+            title = "Want to earn with MTANAV?",
+            subtitle = "Referrals, creator promotions & rewards",
+            onClick = onOpenEarnRequested,
+            hasGoldBorder = true
+        )
     }
 }
 
@@ -612,10 +707,36 @@ private fun AllProductsTopContent(
     onProductSearchQueryChange: (String) -> Unit,
     allProducts: List<ProductDto>,
     onProductSelected: (ProductDto) -> Unit,
-    onBackClicked: () -> Unit
+    onBackClicked: () -> Unit,
+    onCloseDrawerRequested: (() -> Unit)? = null
 ) {
-    TextButton(onClick = onBackClicked, contentPadding = PaddingValues(0.dp)) {
-        Text("← Back to Explore", color = HighlightGold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        TextButton(onClick = onBackClicked, contentPadding = PaddingValues(0.dp)) {
+            Text("← Back to Explore", color = HighlightGold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        }
+
+        onCloseDrawerRequested?.let { onClose ->
+            Surface(
+                shape = CircleShape,
+                color = Color.White.copy(alpha = 0.25f),
+                modifier = Modifier.size(34.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    IconButton(onClick = onClose, modifier = Modifier.size(34.dp)) {
+                        Icon(
+                            imageVector = MtanavIcons.Close,
+                            contentDescription = "Close Menu",
+                            tint = SurfaceWhite,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
+        }
     }
 
     Text("EXPLORE PRODUCTS", fontSize = 18.sp, fontWeight = FontWeight.Black, color = SurfaceWhite)
@@ -665,10 +786,36 @@ private fun AllServicesTopContent(
     onServiceSearchQueryChange: (String) -> Unit,
     allServices: List<CategoryDto>,
     onServiceSelected: (CategoryDto) -> Unit,
-    onBackClicked: () -> Unit
+    onBackClicked: () -> Unit,
+    onCloseDrawerRequested: (() -> Unit)? = null
 ) {
-    TextButton(onClick = onBackClicked, contentPadding = PaddingValues(0.dp)) {
-        Text("← Back to Explore", color = HighlightGold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        TextButton(onClick = onBackClicked, contentPadding = PaddingValues(0.dp)) {
+            Text("← Back to Explore", color = HighlightGold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        }
+
+        onCloseDrawerRequested?.let { onClose ->
+            Surface(
+                shape = CircleShape,
+                color = Color.White.copy(alpha = 0.25f),
+                modifier = Modifier.size(34.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    IconButton(onClick = onClose, modifier = Modifier.size(34.dp)) {
+                        Icon(
+                            imageVector = MtanavIcons.Close,
+                            contentDescription = "Close Menu",
+                            tint = SurfaceWhite,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
+        }
     }
 
     Text("EXPLORE SERVICES", fontSize = 18.sp, fontWeight = FontWeight.Black, color = SurfaceWhite)
@@ -723,12 +870,38 @@ private fun ResultsTopContent(
     error: String?,
     onApplyFilter: (FilterState) -> Unit,
     onClearFilters: () -> Unit,
-    onBackClicked: () -> Unit
+    onBackClicked: () -> Unit,
+    onCloseDrawerRequested: (() -> Unit)? = null
 ) {
     var draftFilter by remember(filterState) { mutableStateOf(filterState) }
 
-    TextButton(onClick = onBackClicked, contentPadding = PaddingValues(0.dp)) {
-        Text(backLabel, color = HighlightGold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        TextButton(onClick = onBackClicked, contentPadding = PaddingValues(0.dp)) {
+            Text(backLabel, color = HighlightGold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        }
+
+        onCloseDrawerRequested?.let { onClose ->
+            Surface(
+                shape = CircleShape,
+                color = Color.White.copy(alpha = 0.25f),
+                modifier = Modifier.size(34.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    IconButton(onClick = onClose, modifier = Modifier.size(34.dp)) {
+                        Icon(
+                            imageVector = MtanavIcons.Close,
+                            contentDescription = "Close Menu",
+                            tint = SurfaceWhite,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
+        }
     }
 
     Text(title.uppercase(), fontSize = 18.sp, fontWeight = FontWeight.Black, color = SurfaceWhite)
@@ -882,7 +1055,10 @@ private fun DistanceFilter(
     Column {
         Text("Location / Distance", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = SurfaceWhite)
         Spacer(modifier = Modifier.height(4.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
+        ) {
             val distances = listOf(1.0 to "1 km", 3.0 to "3 km", 5.0 to "5 km", null to "Any")
             distances.forEach { (dist, label) ->
                 val isSelected = selectedDistance == dist
@@ -939,7 +1115,10 @@ private fun SortFilter(
     Column {
         Text("Sort by", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = SurfaceWhite)
         Spacer(modifier = Modifier.height(4.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
+        ) {
             SortOption.entries.forEach { option ->
                 val isSelected = selectedSort == option
                 val chipBg = if (isSelected) ActionTeal else SurfaceWhite.copy(alpha = 0.2f)
@@ -991,6 +1170,11 @@ private fun TextNavigationTile(
                 )
             }
         }
-        Text("➔", fontSize = 12.sp, color = HighlightGold)
+        Icon(
+            imageVector = MtanavIcons.ArrowForward,
+            contentDescription = null,
+            tint = HighlightGold,
+            modifier = Modifier.size(16.dp)
+        )
     }
 }

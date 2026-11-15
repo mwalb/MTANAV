@@ -12,5 +12,7 @@ expect fun MapCanvas(
     onMarkerSelected: (MapBusiness) -> Unit,
     onViewShopClicked: (Long) -> Unit,
     onNavigateClicked: (MapBusiness) -> Unit,
+    onHamburgerClicked: () -> Unit = {},
+    onSearchClicked: () -> Unit = {},
     modifier: Modifier = Modifier
 )

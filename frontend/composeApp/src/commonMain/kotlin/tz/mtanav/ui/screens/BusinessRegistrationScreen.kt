@@ -53,34 +53,52 @@ fun BusinessRegistrationScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
-            .background(AppBackground)
-            .padding(32.dp),
+            .background(AppBackground),
         contentAlignment = Alignment.Center
     ) {
-        Card(
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-            elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+        val isMobile = maxWidth < 600.dp
+        val outerPadding = if (isMobile) 12.dp else 24.dp
+        val cardInnerPadding = if (isMobile) 16.dp else 36.dp
+
+        Box(
             modifier = Modifier
-                .widthIn(max = 640.dp)
-                .fillMaxWidth()
+                .fillMaxSize()
+                .padding(outerPadding),
+            contentAlignment = Alignment.Center
         ) {
-            Column(
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
                 modifier = Modifier
-                    .padding(40.dp)
-                    .verticalScroll(rememberScrollState())
+                    .widthIn(max = 640.dp)
+                    .fillMaxWidth()
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier
+                        .padding(cardInnerPadding)
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    TextButton(onClick = onBackClicked, contentPadding = PaddingValues(0.dp)) {
-                        Text("← Back", color = PrimaryDeepBlue, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextButton(onClick = onBackClicked, contentPadding = PaddingValues(0.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = tz.mtanav.ui.components.MtanavIcons.ArrowBack,
+                                    contentDescription = null,
+                                    tint = PrimaryDeepBlue,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Back", color = PrimaryDeepBlue, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
                     Text(
                         text = if (isSubmitted) "STATUS: PENDING" else "Step $step of 3",
                         fontSize = 13.sp,
@@ -438,4 +456,5 @@ fun BusinessRegistrationScreen(
             }
         }
     }
+}
 }

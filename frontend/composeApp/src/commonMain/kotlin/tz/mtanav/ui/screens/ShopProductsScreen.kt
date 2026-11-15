@@ -34,6 +34,7 @@ fun ShopProductsScreen(
     locationNavigator: LocationNavigator,
     onBackClicked: () -> Unit,
     onProductSelected: (BusinessProductDto) -> Unit,
+    onMessageShopOwnerClicked: (Long) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var allProducts by remember { mutableStateOf<List<BusinessProductDto>>(emptyList()) }
@@ -83,7 +84,7 @@ fun ShopProductsScreen(
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onBackClicked) {
-                        Text("⬅️", fontSize = 20.sp, color = SurfaceWhite)
+                        Icon(tz.mtanav.ui.components.MtanavIcons.ArrowBack, contentDescription = "Back", tint = SurfaceWhite)
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
@@ -110,11 +111,15 @@ fun ShopProductsScreen(
                                 }
                             }
                         }
-                        Text(
-                            text = "📍 $shopAddress",
-                            fontSize = 12.sp,
-                            color = SurfaceWhite.copy(alpha = 0.85f)
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(tz.mtanav.ui.components.MtanavIcons.LocationOn, contentDescription = null, tint = SurfaceWhite.copy(alpha = 0.85f), modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = shopAddress,
+                                fontSize = 12.sp,
+                                color = SurfaceWhite.copy(alpha = 0.85f)
+                            )
+                        }
                         businessInfo?.description?.let { desc ->
                             Text(
                                 text = desc,
@@ -125,55 +130,15 @@ fun ShopProductsScreen(
                         }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // STOREFRONT CONTACT & NAVIGATION ACTIONS BAR
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(
-                        onClick = {
-                            val activeItemName = displayedProducts.firstOrNull()?.productName
-                                ?: displayedServices.firstOrNull()?.serviceName
-                                ?: "products"
-                            val msg = "Hello $shopName, I found your shop on MTANAV and would like to order/inquire about $activeItemName."
-                            locationNavigator.openWhatsApp(shopPhone, msg)
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Action),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.weight(1f),
-                        contentPadding = PaddingValues(vertical = 8.dp)
-                    ) {
-                        Text("💬 WHATSAPP", fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    }
-
-                    Button(
-                        onClick = { locationNavigator.openPhoneCall(shopPhone) },
-                        colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.weight(1f),
-                        contentPadding = PaddingValues(vertical = 8.dp)
-                    ) {
-                        Text("📞 CALL", fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    }
-
-                    Button(
-                        onClick = { locationNavigator.launchGoogleMapsNavigation(shopLat, shopLng, shopName) },
-                        colors = ButtonDefaults.buttonColors(containerColor = Accent),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.weight(1f),
-                        contentPadding = PaddingValues(vertical = 8.dp)
-                    ) {
-                        Text("🗺️ NAVIGATE", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                    }
-                }
             }
         }
 
+        // SCROLLABLE CATALOGUE CONTENT
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // CONTEXT HEADER & VIEW ALL PRODUCTS ACTION
@@ -429,6 +394,70 @@ fun ShopProductsScreen(
                             }
                         }
                     }
+                }
+            }
+        }
+
+        // STICKY BOTTOM ACTION BAR: 4 CLEAR CONTACT & MESSAGING ACTIONS
+        Surface(
+            color = SurfaceWhite,
+            shadowElevation = 12.dp,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // 1. CALL
+                Button(
+                    onClick = { locationNavigator.openPhoneCall(shopPhone) },
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryDeepBlue),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(vertical = 10.dp, horizontal = 4.dp)
+                ) {
+                    Text("📞 CALL", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                }
+
+                // 2. WHATSAPP
+                Button(
+                    onClick = {
+                        val activeItemName = displayedProducts.firstOrNull()?.productName
+                            ?: displayedServices.firstOrNull()?.serviceName
+                            ?: "items"
+                        val msg = "Hello $shopName, I found your shop on MTANAV and would like to inquire about $activeItemName."
+                        locationNavigator.openWhatsApp(shopPhone, msg)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = ActionTeal),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(vertical = 10.dp, horizontal = 4.dp)
+                ) {
+                    Text("💬 WHATSAPP", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                }
+
+                // 3. NAVIGATE
+                Button(
+                    onClick = { locationNavigator.launchGoogleMapsNavigation(shopLat, shopLng, shopName) },
+                    colors = ButtonDefaults.buttonColors(containerColor = HighlightGold),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(vertical = 10.dp, horizontal = 4.dp)
+                ) {
+                    Text("🗺️ NAVIGATE", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PrimaryDeepBlue)
+                }
+
+                // 4. MESSAGE / INBOX
+                Button(
+                    onClick = { onMessageShopOwnerClicked(businessId) },
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(vertical = 10.dp, horizontal = 4.dp)
+                ) {
+                    Text("✉️ MESSAGE", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }

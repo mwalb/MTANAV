@@ -53,7 +53,7 @@ fun ProductDetailsScreen(
         Surface(color = PrimaryDark, modifier = Modifier.fillMaxWidth()) {
             Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBackClicked) {
-                    Text("⬅️", fontSize = 20.sp, color = SurfaceWhite)
+                    Icon(tz.mtanav.ui.components.MtanavIcons.ArrowBack, contentDescription = "Back", tint = SurfaceWhite)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Product Details", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = SurfaceWhite)
@@ -80,7 +80,12 @@ fun ProductDetailsScreen(
                         modifier = Modifier.size(80.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
-                            Text(icon, fontSize = 48.sp)
+                            Icon(
+                                imageVector = tz.mtanav.ui.components.MtanavIcons.getVectorForCategoryOrEmoji(icon),
+                                contentDescription = null,
+                                tint = PrimaryDark,
+                                modifier = Modifier.size(48.dp)
+                            )
                         }
                     }
 

@@ -1,4 +1,4 @@
-app = "mtanav-api"
+app = "mtanav"
 primary_region = "sin"
 
 [build]

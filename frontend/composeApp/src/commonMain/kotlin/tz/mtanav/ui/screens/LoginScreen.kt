@@ -33,39 +33,57 @@ fun LoginScreen(
     val coroutineScope = rememberCoroutineScope()
 
     // FULL SCREEN CAMPNAV BLUE GRADIENT (#1A237E to #3949AB)
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(CampnavDeepBlue, CampnavBlue)
                 )
-            )
-            .padding(24.dp),
+            ),
         contentAlignment = Alignment.Center
     ) {
-        Card(
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-            elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+        val isMobile = maxWidth < 600.dp
+        val outerPadding = if (isMobile) 12.dp else 24.dp
+        val cardInnerPadding = if (isMobile) 20.dp else 36.dp
+
+        Box(
             modifier = Modifier
-                .widthIn(max = 540.dp)
-                .fillMaxWidth()
+                .fillMaxSize()
+                .padding(outerPadding),
+            contentAlignment = Alignment.Center
         ) {
-            Column(
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
                 modifier = Modifier
-                    .padding(horizontal = 40.dp, vertical = 36.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .widthIn(max = 540.dp)
+                    .fillMaxWidth()
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = cardInnerPadding, vertical = cardInnerPadding)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    TextButton(onClick = onBackClicked, contentPadding = PaddingValues(0.dp)) {
-                        Text("← Back to Discovery Map", color = CampnavDeepBlue, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        TextButton(onClick = onBackClicked, contentPadding = PaddingValues(0.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = tz.mtanav.ui.components.MtanavIcons.ArrowBack,
+                                    contentDescription = null,
+                                    tint = CampnavDeepBlue,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Back to Discovery Map", color = CampnavDeepBlue, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
                     }
-                }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -204,4 +222,5 @@ fun LoginScreen(
             }
         }
     }
+}
 }

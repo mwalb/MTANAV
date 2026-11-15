@@ -31,6 +31,8 @@ actual fun MapCanvas(
     onMarkerSelected: (MapBusiness) -> Unit,
     onViewShopClicked: (Long) -> Unit,
     onNavigateClicked: (MapBusiness) -> Unit,
+    onHamburgerClicked: () -> Unit,
+    onSearchClicked: () -> Unit,
     modifier: Modifier
 ) {
     val context = LocalContext.current
@@ -142,7 +144,12 @@ actual fun MapCanvas(
                             modifier = Modifier.padding(24.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("🗺️", fontSize = 48.sp)
+                            Icon(
+                                imageVector = tz.mtanav.ui.components.MtanavIcons.Map,
+                                contentDescription = null,
+                                tint = PrimaryDeepBlue,
+                                modifier = Modifier.size(48.dp)
+                            )
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
                                 text = "Map Could Not Be Loaded",

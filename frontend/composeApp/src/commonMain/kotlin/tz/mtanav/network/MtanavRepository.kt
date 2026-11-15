@@ -38,6 +38,8 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
     private val mockJobApplications = mutableListOf<JobApplicationDto>()
     private val mockPromotions = mutableListOf<PromotionDto>()
     private val mockSavedPromotions = mutableSetOf<Long>()
+    private val mockConversations = mutableListOf<ConversationDto>()
+    private val mockMessages = mutableListOf<MessageDto>()
 
     init {
         // Seed initial mock orders & bookings
@@ -874,7 +876,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
         } catch (e: Exception) {
             mockJobs.filter { j ->
                 (query == null || j.title.contains(query, ignoreCase = true) || j.description.contains(query, ignoreCase = true)) &&
-                (category == null || j.category.equals(category, ignoreCase = true)) &&
+                (category == null || matchCategoryAlias(category, j.category)) &&
                 (employmentType == null || j.employmentType.equals(employmentType, ignoreCase = true)) &&
                 (location == null || j.location.contains(location, ignoreCase = true))
             }
@@ -1223,6 +1225,137 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
         }
     }
 
+    // =====================================
+    // INTERNAL MESSAGING API METHODS
+    // =====================================
+
+    suspend fun getConversations(): List<ConversationDto> = withContext(Dispatchers.Default) {
+        try {
+            val response: ApiResponseWrapper<List<ConversationDto>> = client.get("$baseUrl/messages/conversations") {
+                authToken?.let { header(HttpHeaders.Authorization, "Bearer $it") }
+            }.body()
+            response.data ?: mockConversations
+        } catch (e: Exception) {
+            val currentId = currentUser?.id ?: 1L
+            mockConversations.filter { it.customerId == currentId || it.shopOwnerId == currentId }
+        }
+    }
+
+    suspend fun startConversation(businessId: Long, initialMessage: String? = null): ConversationDto = withContext(Dispatchers.Default) {
+        try {
+            val response: ApiResponseWrapper<ConversationDto> = client.post("$baseUrl/messages/conversations") {
+                contentType(ContentType.Application.Json)
+                authToken?.let { header(HttpHeaders.Authorization, "Bearer $it") }
+                setBody(CreateConversationRequest(businessId = businessId, initialMessage = initialMessage))
+            }.body()
+            response.data ?: throw Exception("Failed to start conversation")
+        } catch (e: Exception) {
+            val currentId = currentUser?.id ?: 1L
+            val existing = mockConversations.firstOrNull { it.customerId == currentId && it.businessId == businessId }
+            if (existing != null) {
+                if (initialMessage != null && initialMessage.isNotBlank()) {
+                    sendMessage(existing.id, initialMessage)
+                }
+                existing
+            } else {
+                val bName = getFallbackAdminBusinesses().firstOrNull { it.id == businessId }?.name ?: "Shop #$businessId"
+                val newConv = ConversationDto(
+                    id = (mockConversations.size + 1).toLong(),
+                    customerId = currentId,
+                    customerName = currentUser?.fullName ?: "Customer",
+                    businessId = businessId,
+                    businessName = bName,
+                    shopOwnerId = 2L,
+                    shopOwnerName = "Shop Manager",
+                    lastMessageContent = initialMessage ?: "Conversation started",
+                    lastMessageAt = "Just now",
+                    unreadCount = 0,
+                    createdAt = "Just now"
+                )
+                mockConversations.add(0, newConv)
+                if (initialMessage != null && initialMessage.isNotBlank()) {
+                    mockMessages.add(
+                        MessageDto(
+                            id = (mockMessages.size + 1).toLong(),
+                            conversationId = newConv.id,
+                            senderId = currentId,
+                            senderName = currentUser?.fullName ?: "Customer",
+                            senderRole = "CUSTOMER",
+                            content = initialMessage,
+                            isRead = true,
+                            createdAt = "Just now"
+                        )
+                    )
+                }
+                newConv
+            }
+        }
+    }
+
+    suspend fun getMessages(conversationId: Long): List<MessageDto> = withContext(Dispatchers.Default) {
+        try {
+            val response: ApiResponseWrapper<List<MessageDto>> = client.get("$baseUrl/messages/conversations/$conversationId/messages") {
+                authToken?.let { header(HttpHeaders.Authorization, "Bearer $it") }
+            }.body()
+            response.data ?: mockMessages.filter { it.conversationId == conversationId }
+        } catch (e: Exception) {
+            mockMessages.filter { it.conversationId == conversationId }
+        }
+    }
+
+    suspend fun sendMessage(conversationId: Long, content: String): MessageDto = withContext(Dispatchers.Default) {
+        try {
+            val response: ApiResponseWrapper<MessageDto> = client.post("$baseUrl/messages/conversations/$conversationId/messages") {
+                contentType(ContentType.Application.Json)
+                authToken?.let { header(HttpHeaders.Authorization, "Bearer $it") }
+                setBody(SendMessageRequest(content = content))
+            }.body()
+            response.data ?: throw Exception("Failed to send message")
+        } catch (e: Exception) {
+            val currentId = currentUser?.id ?: 1L
+            val isOwner = currentUser?.roles?.contains("ROLE_BUSINESS_OWNER") == true
+            val role = if (isOwner) "SHOP_OWNER" else "CUSTOMER"
+
+            val newMsg = MessageDto(
+                id = (mockMessages.size + 1).toLong(),
+                conversationId = conversationId,
+                senderId = currentId,
+                senderName = currentUser?.fullName ?: "User",
+                senderRole = role,
+                content = content,
+                isRead = true,
+                createdAt = "Just now"
+            )
+            mockMessages.add(newMsg)
+
+            val idx = mockConversations.indexOfFirst { it.id == conversationId }
+            if (idx != -1) {
+                val conv = mockConversations[idx]
+                mockConversations[idx] = conv.copy(
+                    lastMessageContent = content,
+                    lastMessageAt = "Just now"
+                )
+            }
+
+            newMsg
+        }
+    }
+
+    suspend fun markConversationRead(conversationId: Long): Boolean = withContext(Dispatchers.Default) {
+        try {
+            client.patch("$baseUrl/messages/conversations/$conversationId/read") {
+                authToken?.let { header(HttpHeaders.Authorization, "Bearer $it") }
+            }
+            true
+        } catch (e: Exception) {
+            val idx = mockConversations.indexOfFirst { it.id == conversationId }
+            if (idx != -1) {
+                mockConversations[idx] = mockConversations[idx].copy(unreadCount = 0)
+            }
+            true
+        }
+    }
+
     private fun getFallbackMyBusinesses(): List<BusinessDto> = listOf(
         BusinessDto(
             id = 1,
@@ -1379,6 +1512,18 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
         val a = sin(dLat / 2).pow(2.0) + cos(lat1 * (PI / 180.0)) * cos(lat2 * (PI / 180.0)) * sin(dLon / 2).pow(2.0)
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))
         return r * c
+    }
+
+    private fun matchCategoryAlias(requested: String, actual: String): Boolean {
+        val req = requested.lowercase()
+        val act = actual.lowercase()
+        if (req == act) return true
+        if (req.contains("delivery") && (act.contains("delivery") || act.contains("logistics"))) return true
+        if (req.contains("tech") && (act.contains("tech") || act.contains("it") || act.contains("repair"))) return true
+        if (req.contains("market") && (act.contains("market") || act.contains("sales"))) return true
+        if (req.contains("sales") && (act.contains("sales") || act.contains("retail"))) return true
+        if (req.contains("hospit") && (act.contains("hospit") || act.contains("food"))) return true
+        return false
     }
 
     private fun String.capitalizeWords(): String = this.split(" ")

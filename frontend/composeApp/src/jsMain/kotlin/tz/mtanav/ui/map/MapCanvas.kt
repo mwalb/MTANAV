@@ -26,6 +26,8 @@ actual fun MapCanvas(
     onMarkerSelected: (MapBusiness) -> Unit,
     onViewShopClicked: (Long) -> Unit,
     onNavigateClicked: (MapBusiness) -> Unit,
+    onHamburgerClicked: () -> Unit,
+    onSearchClicked: () -> Unit,
     modifier: Modifier
 ) {
     var loadState by remember { mutableStateOf<MapLoadState>(MapLoadState.Loading) }
@@ -36,21 +38,52 @@ actual fun MapCanvas(
             containerId = "map",
             onBusinessSelected = onMarkerSelected,
             onViewShopClicked = onViewShopClicked,
-            onNavigateClicked = onNavigateClicked
+            onNavigateClicked = onNavigateClicked,
+            onHamburgerClicked = onHamburgerClicked,
+            onSearchClicked = onSearchClicked
+        )
+    }
+
+    val mapUiManager = remember {
+        MapUiManager(
+            onSearchSubmitted = { query ->
+                onSearchClicked()
+            },
+            onCategorySelected = { cat ->
+                onSearchClicked()
+            },
+            onFilterApplied = { minP, maxP, dist ->
+                onSearchClicked()
+            },
+            onBusinessSelected = { b ->
+                onMarkerSelected(b)
+                mapController.focusBusiness(b)
+            },
+            onViewShopClicked = onViewShopClicked,
+            onNavigateClicked = onNavigateClicked,
+            onMessageShopOwner = { businessId ->
+                onViewShopClicked(businessId)
+            },
+            onNavJobs = onHamburgerClicked,
+            onNavPromotions = onHamburgerClicked,
+            onNavEarn = onHamburgerClicked,
+            onNavAuth = onHamburgerClicked
         )
     }
 
     DisposableEffect(Unit) {
         val composeRoot = document.getElementById("compose-root")
         val mapRoot = document.getElementById("map-root")
+        val mapUiRoot = document.getElementById("map-ui-root")
 
-        composeRoot?.classList?.add("with-map")
+        composeRoot?.classList?.remove("visible")
         mapRoot?.classList?.add("visible")
+        mapUiRoot?.classList?.add("visible")
+        mapController.triggerResize()
 
         onDispose {
-            composeRoot?.classList?.remove("with-map")
-            mapRoot?.classList?.remove("visible")
-            mapController.destroy()
+            mapUiRoot?.classList?.remove("visible")
+            composeRoot?.classList?.add("visible")
         }
     }
 
@@ -61,6 +94,7 @@ actual fun MapCanvas(
                 loadState = MapLoadState.Success
                 mapController.initialize()
                 mapController.showBusinesses(businesses)
+                mapUiManager.renderBusinessList(businesses, selectedBusiness)
             },
             onError = { message, details ->
                 loadState = MapLoadState.Error(message, details)
@@ -68,15 +102,14 @@ actual fun MapCanvas(
         )
     }
 
-    LaunchedEffect(businesses, loadState) {
+    LaunchedEffect(businesses, selectedBusiness, loadState) {
         if (loadState is MapLoadState.Success) {
             mapController.showBusinesses(businesses)
-        }
-    }
-
-    LaunchedEffect(selectedBusiness, loadState) {
-        if (loadState is MapLoadState.Success && selectedBusiness != null) {
-            mapController.focusBusiness(selectedBusiness)
+            mapUiManager.renderBusinessList(businesses, selectedBusiness)
+            if (selectedBusiness != null) {
+                mapController.focusBusiness(selectedBusiness)
+                mapUiManager.showShopDetails(selectedBusiness)
+            }
         }
     }
 
@@ -119,7 +152,14 @@ actual fun MapCanvas(
                         modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("🗺️", fontSize = 48.sp)
+                        tz.mtanav.ui.components.MtanavIcons.getVectorForCategoryOrEmoji("map").let { vec ->
+                            Icon(
+                                imageVector = vec,
+                                contentDescription = null,
+                                tint = PrimaryDeepBlue,
+                                modifier = Modifier.size(48.dp)
+                            )
+                        }
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             text = state.message,
@@ -149,7 +189,7 @@ actual fun MapCanvas(
         }
 
         is MapLoadState.Success -> {
-            // Native HTML map is visible in DOM #map-root container directly.
+            // Native HTML map is visible in DOM #map-root and #map-ui-root containers directly.
         }
     }
 }

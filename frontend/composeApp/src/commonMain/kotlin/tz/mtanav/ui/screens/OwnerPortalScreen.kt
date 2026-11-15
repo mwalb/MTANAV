@@ -24,6 +24,7 @@ import tz.mtanav.theme.*
 enum class OwnerSection(val title: String, val isHeaderAction: Boolean = false) {
     Dashboard("Dashboard"),
     PostProductService("Post Product/Service", isHeaderAction = true),
+    Messages("Customer Messages"),
     MyProducts("My Products"),
     MyServices("My Services"),
     MyBusiness("My Business"),
@@ -41,6 +42,7 @@ enum class OwnerSection(val title: String, val isHeaderAction: Boolean = false) 
 fun OwnerPortalScreen(
     repository: MtanavRepository,
     initialSection: OwnerSection = OwnerSection.Dashboard,
+    targetConversationId: Long? = null,
     onNavigateToPublicMap: () -> Unit,
     onLogoutClicked: () -> Unit,
     modifier: Modifier = Modifier
@@ -89,154 +91,339 @@ fun OwnerPortalScreen(
         loadOwnerData()
     }
 
-    Row(
+    var drawerOpen by remember { mutableStateOf(false) }
+
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(AppBackground)
     ) {
-        // OWNER SIDEBAR
-        OwnerSidebar(
-            activeSection = activeSection,
-            business = selectedBusiness,
-            onSectionSelected = { activeSection = it },
-            onNavigateToPublicMap = onNavigateToPublicMap,
-            onLogoutClicked = onLogoutClicked,
-            modifier = Modifier.width(300.dp).fillMaxHeight()
-        )
+        val isSmallOrMedium = maxWidth < 1024.dp
 
-        VerticalDivider(color = Color(0xFFE2E8F0), modifier = Modifier.fillMaxHeight().width(1.dp))
-
-        // OWNER CONTENT AREA (NO GOOGLE MAP)
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .background(AppBackground)
-                .padding(24.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                // Header Bar
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp)
+        if (isSmallOrMedium) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                // MAIN CONTENT AREA
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    Column {
-                        Text(
-                            text = activeSection.title.uppercase(),
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Black,
-                            color = PrimaryDeepBlue,
-                            letterSpacing = 1.sp
-                        )
-                        Text(
-                            text = "Business Owner Portal • ${selectedBusiness?.name ?: "MTANAV Business"}",
-                            fontSize = 13.sp,
-                            color = TextSecondary
-                        )
-                    }
+                    // Header Bar with Hamburger Trigger
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(onClick = { drawerOpen = !drawerOpen }) {
+                                Icon(
+                                    imageVector = tz.mtanav.ui.components.MtanavIcons.Menu,
+                                    contentDescription = "Open Navigation Menu",
+                                    tint = PrimaryDeepBlue
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Column {
+                                Text(
+                                    text = activeSection.title.uppercase(),
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = PrimaryDeepBlue,
+                                    letterSpacing = 1.sp
+                                )
+                                Text(
+                                    text = selectedBusiness?.name ?: "MTANAV Business",
+                                    fontSize = 12.sp,
+                                    color = TextSecondary
+                                )
+                            }
+                        }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Button(
                             onClick = { activeSection = OwnerSection.PostProductService },
                             colors = ButtonDefaults.buttonColors(containerColor = PrimaryDeepBlue),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
                         ) {
-                            Text("➕ POST PRODUCT OR SERVICE", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            Text("➕ POST ITEM", fontWeight = FontWeight.Bold, fontSize = 11.sp)
                         }
                     }
-                }
 
-                message?.let { msg ->
-                    Surface(shape = RoundedCornerShape(8.dp), color = SuccessGreen.copy(alpha = 0.1f), modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
-                        Text(msg, color = SuccessGreen, fontSize = 13.sp, modifier = Modifier.padding(12.dp))
+                    message?.let { msg ->
+                        Surface(shape = RoundedCornerShape(8.dp), color = SuccessGreen.copy(alpha = 0.1f), modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
+                            Text(msg, color = SuccessGreen, fontSize = 13.sp, modifier = Modifier.padding(12.dp))
+                        }
                     }
-                }
 
-                errorMessage?.let { err ->
-                    Surface(shape = RoundedCornerShape(8.dp), color = ErrorRed.copy(alpha = 0.1f), modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
-                        Text(err, color = ErrorRed, fontSize = 13.sp, modifier = Modifier.padding(12.dp))
+                    errorMessage?.let { err ->
+                        Surface(shape = RoundedCornerShape(8.dp), color = ErrorRed.copy(alpha = 0.1f), modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
+                            Text(err, color = ErrorRed, fontSize = 13.sp, modifier = Modifier.padding(12.dp))
+                        }
                     }
-                }
 
-                // CONTENT ROUTING
-                when (activeSection) {
-                    OwnerSection.Dashboard -> OwnerDashboardContent(
-                        business = selectedBusiness,
-                        productsCount = products.size,
-                        servicesCount = services.size,
-                        ordersCount = orders.size,
-                        bookingsCount = bookings.size,
-                        onNavigateSection = { activeSection = it }
-                    )
-
-                    OwnerSection.MyProducts -> OwnerProductsContent(
-                        products = products,
-                        business = selectedBusiness
-                    )
-
-                    OwnerSection.MyServices -> OwnerServicesContent(
-                        services = services,
-                        business = selectedBusiness
-                    )
-
-                    OwnerSection.MyBusiness -> OwnerBusinessDetailsContent(
-                        business = selectedBusiness
-                    )
-
-                    OwnerSection.Jobs -> OwnerJobsContent(
-                        business = selectedBusiness,
-                        repository = repository
-                    )
-
-                    OwnerSection.Promotions -> OwnerPromotionsContent(
-                        business = selectedBusiness,
-                        products = products,
-                        services = services,
-                        repository = repository
-                    )
-
-                    OwnerSection.Photos -> OwnerPhotosContent(
-                        business = selectedBusiness,
+                    // RENDER ACTIVE SECTION CONTENT
+                    renderOwnerSectionContent(
+                        activeSection = activeSection,
+                        selectedBusiness = selectedBusiness,
                         photoUsage = photoUsage,
-                        repository = repository,
-                        onPhotosUpdated = { loadOwnerData() }
-                    )
-
-                    OwnerSection.Orders -> OwnerOrdersContent(
                         orders = orders,
-                        repository = repository,
-                        onStatusChanged = { loadOwnerData() }
-                    )
-
-                    OwnerSection.Bookings -> OwnerBookingsContent(
                         bookings = bookings,
+                        products = products,
+                        services = services,
                         repository = repository,
-                        onStatusChanged = { loadOwnerData() }
+                        targetConversationId = targetConversationId,
+                        onSectionChange = { activeSection = it },
+                        onRefreshData = { loadOwnerData() },
+                        onMessageChanged = { msg -> message = msg }
+                    )
+                }
+
+                // HAMBURGER NAVIGATION DRAWER OVERLAY
+                if (drawerOpen) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.5f))
+                            .clickable { drawerOpen = false }
                     )
 
-                    OwnerSection.Payments -> OwnerPaymentsContent(orders = orders, bookings = bookings)
+                    Surface(
+                        shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp),
+                        color = SurfaceWhite,
+                        shadowElevation = 16.dp,
+                        modifier = Modifier
+                            .widthIn(max = 300.dp)
+                            .fillMaxHeight()
+                            .align(Alignment.CenterStart)
+                            .clickable(enabled = false) {}
+                    ) {
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(PrimaryDeepBlue)
+                                    .padding(horizontal = 16.dp, vertical = 10.dp)
+                            ) {
+                                Text(
+                                    text = "OWNER MENU",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = SurfaceWhite,
+                                    letterSpacing = 1.sp
+                                )
+                                IconButton(onClick = { drawerOpen = false }) {
+                                    Icon(
+                                        imageVector = tz.mtanav.ui.components.MtanavIcons.Close,
+                                        contentDescription = "Close Menu",
+                                        tint = SurfaceWhite
+                                    )
+                                }
+                            }
 
-                    OwnerSection.Verification -> OwnerVerificationContent(business = selectedBusiness)
-
-                    OwnerSection.Settings -> OwnerSettingsContent()
-
-                    OwnerSection.PostProductService -> OwnerPostProductServiceContent(
-                        business = selectedBusiness,
-                        repository = repository,
-                        onSuccess = {
-                            message = "Item posted successfully!"
-                            loadOwnerData()
-                            activeSection = OwnerSection.MyProducts
+                            OwnerSidebar(
+                                activeSection = activeSection,
+                                business = selectedBusiness,
+                                onSectionSelected = { section ->
+                                    activeSection = section
+                                    drawerOpen = false
+                                },
+                                onNavigateToPublicMap = {
+                                    drawerOpen = false
+                                    onNavigateToPublicMap()
+                                },
+                                onLogoutClicked = {
+                                    drawerOpen = false
+                                    onLogoutClicked()
+                                },
+                                modifier = Modifier.fillMaxSize()
+                            )
                         }
-                    )
+                    }
+                }
+            }
+        } else {
+            // DESKTOP LAYOUT (>= 1024dp)
+            Row(modifier = Modifier.fillMaxSize()) {
+                OwnerSidebar(
+                    activeSection = activeSection,
+                    business = selectedBusiness,
+                    onSectionSelected = { activeSection = it },
+                    onNavigateToPublicMap = onNavigateToPublicMap,
+                    onLogoutClicked = onLogoutClicked,
+                    modifier = Modifier.width(300.dp).fillMaxHeight()
+                )
+
+                VerticalDivider(color = Color(0xFFE2E8F0), modifier = Modifier.fillMaxHeight().width(1.dp))
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .background(AppBackground)
+                        .padding(24.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp)
+                        ) {
+                            Column {
+                                Text(
+                                    text = activeSection.title.uppercase(),
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = PrimaryDeepBlue,
+                                    letterSpacing = 1.sp
+                                )
+                                Text(
+                                    text = "Business Owner Portal • ${selectedBusiness?.name ?: "MTANAV Business"}",
+                                    fontSize = 13.sp,
+                                    color = TextSecondary
+                                )
+                            }
+
+                            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Button(
+                                    onClick = { activeSection = OwnerSection.PostProductService },
+                                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryDeepBlue),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text("➕ POST PRODUCT OR SERVICE", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                }
+                            }
+                        }
+
+                        message?.let { msg ->
+                            Surface(shape = RoundedCornerShape(8.dp), color = SuccessGreen.copy(alpha = 0.1f), modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
+                                Text(msg, color = SuccessGreen, fontSize = 13.sp, modifier = Modifier.padding(12.dp))
+                            }
+                        }
+
+                        errorMessage?.let { err ->
+                            Surface(shape = RoundedCornerShape(8.dp), color = ErrorRed.copy(alpha = 0.1f), modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
+                                Text(err, color = ErrorRed, fontSize = 13.sp, modifier = Modifier.padding(12.dp))
+                            }
+                        }
+
+                        renderOwnerSectionContent(
+                            activeSection = activeSection,
+                            selectedBusiness = selectedBusiness,
+                            photoUsage = photoUsage,
+                            orders = orders,
+                            bookings = bookings,
+                            products = products,
+                            services = services,
+                            repository = repository,
+                            targetConversationId = targetConversationId,
+                            onSectionChange = { activeSection = it },
+                            onRefreshData = { loadOwnerData() },
+                            onMessageChanged = { msg -> message = msg }
+                        )
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun renderOwnerSectionContent(
+    activeSection: OwnerSection,
+    selectedBusiness: BusinessDto?,
+    photoUsage: PhotoUsageDto?,
+    orders: List<OrderDto>,
+    bookings: List<BookingDto>,
+    products: List<BusinessProductDto>,
+    services: List<BusinessServiceDto>,
+    repository: MtanavRepository,
+    targetConversationId: Long?,
+    onSectionChange: (OwnerSection) -> Unit,
+    onRefreshData: () -> Unit,
+    onMessageChanged: (String?) -> Unit
+) {
+    when (activeSection) {
+        OwnerSection.Dashboard -> OwnerDashboardContent(
+            business = selectedBusiness,
+            productsCount = products.size,
+            servicesCount = services.size,
+            ordersCount = orders.size,
+            bookingsCount = bookings.size,
+            onNavigateSection = onSectionChange
+        )
+
+        OwnerSection.Messages -> OwnerMessagesContent(
+            repository = repository,
+            targetConversationId = targetConversationId
+        )
+
+        OwnerSection.MyProducts -> OwnerProductsContent(
+            products = products,
+            business = selectedBusiness
+        )
+
+        OwnerSection.MyServices -> OwnerServicesContent(
+            services = services,
+            business = selectedBusiness
+        )
+
+        OwnerSection.MyBusiness -> OwnerBusinessDetailsContent(
+            business = selectedBusiness
+        )
+
+        OwnerSection.Jobs -> OwnerJobsContent(
+            business = selectedBusiness,
+            repository = repository
+        )
+
+        OwnerSection.Promotions -> OwnerPromotionsContent(
+            business = selectedBusiness,
+            products = products,
+            services = services,
+            repository = repository
+        )
+
+        OwnerSection.Photos -> OwnerPhotosContent(
+            business = selectedBusiness,
+            photoUsage = photoUsage,
+            repository = repository,
+            onPhotosUpdated = onRefreshData
+        )
+
+        OwnerSection.Orders -> OwnerOrdersContent(
+            orders = orders,
+            repository = repository,
+            onStatusChanged = onRefreshData
+        )
+
+        OwnerSection.Bookings -> OwnerBookingsContent(
+            bookings = bookings,
+            repository = repository,
+            onStatusChanged = onRefreshData
+        )
+
+        OwnerSection.Payments -> OwnerPaymentsContent(orders = orders, bookings = bookings)
+
+        OwnerSection.Verification -> OwnerVerificationContent(business = selectedBusiness)
+
+        OwnerSection.Settings -> OwnerSettingsContent()
+
+        OwnerSection.PostProductService -> OwnerPostProductServiceContent(
+            business = selectedBusiness,
+            repository = repository,
+            onSuccess = {
+                onMessageChanged("Item posted successfully!")
+                onRefreshData()
+                onSectionChange(OwnerSection.MyProducts)
+            }
+        )
     }
 }
 
@@ -888,6 +1075,150 @@ private fun OwnerPromotionsContent(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("POST TO MTANAV", fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@Composable
+private fun OwnerMessagesContent(
+    repository: MtanavRepository,
+    targetConversationId: Long? = null
+) {
+    var conversations by remember { mutableStateOf<List<ConversationDto>>(emptyList()) }
+    var selectedConversation by remember { mutableStateOf<ConversationDto?>(null) }
+    var messages by remember { mutableStateOf<List<MessageDto>>(emptyList()) }
+    var messageText by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var isSending by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
+    fun loadConversations() {
+        coroutineScope.launch {
+            isLoading = true
+            try {
+                val list = repository.getConversations()
+                conversations = list
+
+                if (selectedConversation == null && list.isNotEmpty()) {
+                    selectedConversation = if (targetConversationId != null) {
+                        list.firstOrNull { it.id == targetConversationId } ?: list.first()
+                    } else {
+                        list.first()
+                    }
+                }
+
+                selectedConversation?.let { conv ->
+                    messages = repository.getMessages(conv.id)
+                    repository.markConversationRead(conv.id)
+                }
+            } catch (e: Exception) {
+                /* handled */
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    LaunchedEffect(targetConversationId) {
+        loadConversations()
+    }
+
+    fun handleSendMessage() {
+        val conv = selectedConversation ?: return
+        if (messageText.isBlank()) return
+        val text = messageText.trim()
+        messageText = ""
+
+        coroutineScope.launch {
+            isSending = true
+            try {
+                repository.sendMessage(conv.id, text)
+                messages = repository.getMessages(conv.id)
+                val updatedList = repository.getConversations()
+                conversations = updatedList
+                selectedConversation = updatedList.firstOrNull { it.id == conv.id } ?: conv
+            } catch (e: Exception) {
+                /* handled */
+            } finally {
+                isSending = false
+            }
+        }
+    }
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 480.dp, max = 650.dp)
+    ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val isNarrow = maxWidth < 700.dp
+
+            if (isNarrow) {
+                if (selectedConversation == null || conversations.isEmpty()) {
+                    ConversationListPanel(
+                        conversations = conversations,
+                        selectedConversation = selectedConversation,
+                        isLoading = isLoading,
+                        onSelect = { conv ->
+                            selectedConversation = conv
+                            coroutineScope.launch {
+                                messages = repository.getMessages(conv.id)
+                                repository.markConversationRead(conv.id)
+                            }
+                        }
+                    )
+                } else {
+                    ChatMessageViewPanel(
+                        conversation = selectedConversation!!,
+                        messages = messages,
+                        messageText = messageText,
+                        isSending = isSending,
+                        onBackToList = { selectedConversation = null },
+                        onMessageTextChange = { messageText = it },
+                        onSend = { handleSendMessage() },
+                        isCustomer = false
+                    )
+                }
+            } else {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    Box(modifier = Modifier.weight(0.4f).fillMaxHeight()) {
+                        ConversationListPanel(
+                            conversations = conversations,
+                            selectedConversation = selectedConversation,
+                            isLoading = isLoading,
+                            onSelect = { conv ->
+                                selectedConversation = conv
+                                coroutineScope.launch {
+                                    messages = repository.getMessages(conv.id)
+                                    repository.markConversationRead(conv.id)
+                                }
+                            }
+                        )
+                    }
+
+                    VerticalDivider(color = Color(0xFFE2E8F0))
+
+                    Box(modifier = Modifier.weight(0.6f).fillMaxHeight()) {
+                        if (selectedConversation != null) {
+                            ChatMessageViewPanel(
+                                conversation = selectedConversation!!,
+                                messages = messages,
+                                messageText = messageText,
+                                isSending = isSending,
+                                onBackToList = null,
+                                onMessageTextChange = { messageText = it },
+                                onSend = { handleSendMessage() },
+                                isCustomer = false
+                            )
+                        } else {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("Select a customer conversation to reply.", color = TextSecondary, fontSize = 14.sp)
+                            }
+                        }
+                    }
+                }
             }
         }
     }

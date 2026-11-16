@@ -1,19 +1,11 @@
 package tz.mtanav.ui.map
 
 import android.os.Bundle
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -21,7 +13,6 @@ import com.google.android.gms.maps.MapView
 import tz.mtanav.map.AndroidNativeMapController
 import tz.mtanav.model.MapBusiness
 import tz.mtanav.model.MapLoadState
-import tz.mtanav.theme.*
 
 @Composable
 actual fun MapCanvas(
@@ -33,157 +24,77 @@ actual fun MapCanvas(
     onNavigateClicked: (MapBusiness) -> Unit,
     onHamburgerClicked: () -> Unit,
     onSearchClicked: () -> Unit,
+    onOpenProductsRequested: () -> Unit,
+    onOpenServicesRequested: () -> Unit,
+    onOpenPromotionsRequested: () -> Unit,
+    onOpenJobsRequested: () -> Unit,
+    onOpenEarnRequested: () -> Unit,
+    onSearchSubmitted: (String) -> Unit,
+    onAuthRequested: () -> Unit,
+    isDrawerOpen: Boolean,
     modifier: Modifier
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
     var loadState by remember { mutableStateOf<MapLoadState>(MapLoadState.Loading) }
-    var retryTrigger by remember { mutableStateOf(0) }
+    var mapView by remember { mutableStateOf<MapView?>(null) }
+    var mapController by remember { mutableStateOf<AndroidNativeMapController?>(null) }
 
-    val controller = remember(context) {
-        AndroidNativeMapController(
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_CREATE -> mapView?.onCreate(Bundle())
+                Lifecycle.Event.ON_START -> mapView?.onStart()
+                Lifecycle.Event.ON_RESUME -> mapView?.onResume()
+                Lifecycle.Event.ON_PAUSE -> mapView?.onPause()
+                Lifecycle.Event.ON_STOP -> mapView?.onStop()
+                Lifecycle.Event.ON_DESTROY -> mapView?.onDestroy()
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            mapController?.destroy()
+        }
+    }
+
+    LaunchedEffect(mapView) {
+        val view = mapView ?: return@LaunchedEffect
+        val controller = AndroidNativeMapController(
             context = context,
             onBusinessSelected = onMarkerSelected,
             onViewShopClicked = onViewShopClicked,
             onNavigateClicked = onNavigateClicked
         )
-    }
-
-    val mapView = remember(context, retryTrigger) {
-        MapView(context).apply {
-            onCreate(Bundle())
+        mapController = controller
+        view.getMapAsync { googleMap ->
+            controller.attachGoogleMap(googleMap)
+            loadState = MapLoadState.Success
         }
-    }
-
-    DisposableEffect(lifecycleOwner, mapView) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_START -> mapView.onStart()
-                Lifecycle.Event.ON_RESUME -> mapView.onResume()
-                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
-                Lifecycle.Event.ON_STOP -> mapView.onStop()
-                Lifecycle.Event.ON_DESTROY -> {
-                    mapView.onDestroy()
-                    controller.destroy()
-                }
-                else -> {}
-            }
-        }
-
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-            try {
-                mapView.onDestroy()
-                controller.destroy()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    LaunchedEffect(mapView, retryTrigger) {
-        loadState = MapLoadState.Loading
-        try {
-            mapView.getMapAsync { googleMap ->
-                controller.attachGoogleMap(googleMap)
-                loadState = MapLoadState.Success
-                controller.showBusinesses(businesses)
-            }
-        } catch (e: Exception) {
-            loadState = MapLoadState.Error("Failed to initialize Google Maps SDK: ${e.message}")
-        }
+        controller.initialize()
     }
 
     LaunchedEffect(businesses, loadState) {
         if (loadState is MapLoadState.Success) {
-            controller.showBusinesses(businesses)
+            mapController?.showBusinesses(businesses)
         }
     }
 
     LaunchedEffect(selectedBusiness, loadState) {
         if (loadState is MapLoadState.Success && selectedBusiness != null) {
-            controller.focusBusiness(selectedBusiness)
+            mapController?.focusBusiness(selectedBusiness)
         }
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        when (val state = loadState) {
-            is MapLoadState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize().background(AppBackground),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator(color = PrimaryDeepBlue)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Loading Google Maps SDK...",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = TextSecondary
-                        )
-                    }
-                }
+    AndroidView(
+        factory = { ctx ->
+            MapView(ctx).also { mv ->
+                mapView = mv
+                mv.onCreate(Bundle())
             }
-
-            is MapLoadState.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize().background(AppBackground).padding(24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Card(
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                        modifier = Modifier.widthIn(max = 400.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                imageVector = tz.mtanav.ui.components.MtanavIcons.Map,
-                                contentDescription = null,
-                                tint = PrimaryDeepBlue,
-                                modifier = Modifier.size(48.dp)
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Text(
-                                text = "Map Could Not Be Loaded",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = ErrorRed,
-                                textAlign = TextAlign.Center
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = state.message,
-                                fontSize = 13.sp,
-                                color = TextSecondary,
-                                textAlign = TextAlign.Center
-                            )
-                            Spacer(modifier = Modifier.height(20.dp))
-                            Button(
-                                onClick = { retryTrigger++ },
-                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryDeepBlue),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Text("Retry Loading Map", fontWeight = FontWeight.Bold)
-                            }
-                        }
-                    }
-                }
-            }
-
-            is MapLoadState.Success -> {
-                AndroidView(
-                    factory = { mapView },
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-        }
-    }
+        },
+        modifier = modifier.fillMaxSize()
+    )
 }

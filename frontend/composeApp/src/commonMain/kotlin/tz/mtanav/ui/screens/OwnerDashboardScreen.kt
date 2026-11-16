@@ -8,12 +8,14 @@ import tz.mtanav.network.MtanavRepository
 fun OwnerDashboardScreen(
     repository: MtanavRepository,
     onBackClicked: () -> Unit,
+    onOpenPublicShop: ((Long) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     OwnerPortalScreen(
         repository = repository,
         initialSection = OwnerSection.Dashboard,
         onNavigateToPublicMap = onBackClicked,
+        onOpenPublicShop = onOpenPublicShop,
         onLogoutClicked = onBackClicked,
         modifier = modifier
     )

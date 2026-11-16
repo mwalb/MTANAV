@@ -12,7 +12,7 @@
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDnKLNd3113Sj2042jlLdZVbCxblsjAgf8" />
+            android:value="AIzaSyBSk9e15FR33cGzxsSqKI6iVmiPFhwR92M" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

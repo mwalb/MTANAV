@@ -22,7 +22,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
 
     private val client = HttpClient {
         install(ContentNegotiation) {
-            json(json)
+            json(json, ContentType.parse("application/json"))
         }
     }
 
@@ -30,6 +30,7 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
     var currentUser: UserDto? = null
 
     // In-memory mock storage for portal state when backend is offline
+    private val mockBusinesses = mutableListOf<BusinessDto>()
     private val mockProducts = mutableListOf<BusinessProductDto>()
     private val mockServices = mutableListOf<BusinessServiceDto>()
     private val mockOrders = mutableListOf<OrderDto>()
@@ -688,12 +689,12 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
             }.body()
             response.data ?: emptyList()
         } catch (e: Exception) {
-            getFallbackMyBusinesses()
+            if (mockBusinesses.isNotEmpty()) mockBusinesses else getFallbackMyBusinesses()
         }
     }
 
     suspend fun createBusiness(request: CreateBusinessRequest): BusinessDto = withContext(Dispatchers.Default) {
-        try {
+        val created = try {
             val response: ApiResponseWrapper<BusinessDto> = client.post("$baseUrl/businesses") {
                 contentType(ContentType.Application.Json)
                 authToken?.let { header(HttpHeaders.Authorization, "Bearer $it") }
@@ -702,13 +703,13 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
             response.data ?: throw Exception("Failed to create business")
         } catch (e: Exception) {
             BusinessDto(
-                id = 101,
+                id = (mockBusinesses.size + 101).toLong(),
                 ownerId = currentUser?.id ?: 2,
                 name = request.name,
                 description = request.description,
                 phone = request.phone,
                 email = request.email,
-                verificationStatus = "PENDING",
+                verificationStatus = "VERIFIED",
                 supportsDelivery = request.supportsDelivery,
                 supportsPickup = request.supportsPickup,
                 latitude = request.latitude,
@@ -727,6 +728,64 @@ class MtanavRepository(private val baseUrl: String = ApiConfig.getBaseUrl()) {
                 imageUrls = emptyList()
             )
         }
+        mockBusinesses.add(0, created)
+        created
+    }
+
+    suspend fun updateBusinessProfile(
+        businessId: Long,
+        name: String,
+        description: String?,
+        address: String,
+        phone: String?,
+        logoUrl: String?
+    ): BusinessDto = withContext(Dispatchers.Default) {
+        val updated = try {
+            val req = mapOf(
+                "name" to name,
+                "description" to description,
+                "address" to address,
+                "phone" to phone,
+                "logoUrl" to logoUrl
+            )
+            val response: ApiResponseWrapper<BusinessDto> = client.put("$baseUrl/businesses/$businessId") {
+                contentType(ContentType.Application.Json)
+                authToken?.let { header(HttpHeaders.Authorization, "Bearer $it") }
+                setBody(req)
+            }.body()
+            response.data ?: throw Exception("Failed to update business")
+        } catch (e: Exception) {
+            val idx = mockBusinesses.indexOfFirst { it.id == businessId }
+            if (idx != -1) {
+                val old = mockBusinesses[idx]
+                val newBiz = old.copy(
+                    name = name,
+                    description = description,
+                    address = address,
+                    phone = phone,
+                    logoUrl = logoUrl
+                )
+                mockBusinesses[idx] = newBiz
+                newBiz
+            } else {
+                BusinessDto(
+                    id = businessId,
+                    ownerId = currentUser?.id ?: 2L,
+                    name = name,
+                    description = description,
+                    address = address,
+                    phone = phone,
+                    logoUrl = logoUrl,
+                    verificationStatus = "VERIFIED",
+                    supportsDelivery = true,
+                    supportsPickup = true,
+                    latitude = -6.8182,
+                    longitude = 39.2778,
+                    city = "Dar es Salaam"
+                )
+            }
+        }
+        updated
     }
 
     suspend fun getPhotoUsage(businessId: Long): PhotoUsageDto = withContext(Dispatchers.Default) {

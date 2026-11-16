@@ -5,7 +5,7 @@ object ApiConfig {
      * Default Google Maps API Key for development.
      * Can be replaced or configured per build/environment.
      */
-    const val GOOGLE_MAPS_API_KEY = "AIzaSyDnKLNd3113Sj2042jlLdZVbCxblsjAgf8"
+    const val GOOGLE_MAPS_API_KEY = "AIzaSyBSk9e15FR33cGzxsSqKI6iVmiPFhwR92M"
 
     /**
      * Default initial camera position (Dar es Salaam, Tanzania).

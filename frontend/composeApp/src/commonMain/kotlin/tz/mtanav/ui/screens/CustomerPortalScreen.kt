@@ -23,7 +23,9 @@ import kotlinx.coroutines.launch
 import tz.mtanav.model.*
 import tz.mtanav.network.MtanavRepository
 import tz.mtanav.theme.*
+import tz.mtanav.ui.components.MtanavIcons
 import tz.mtanav.ui.map.LocationNavigator
+import tz.mtanav.util.FormattingUtils
 
 enum class CustomerSection(val title: String) {
     Dashboard("Dashboard"),
@@ -97,7 +99,7 @@ fun CustomerPortalScreen(
             onSectionSelected = { activeSection = it },
             onNavigateToPublicMap = onNavigateToPublicMap,
             onLogoutClicked = onLogoutClicked,
-            modifier = Modifier.width(300.dp).fillMaxHeight()
+            modifier = Modifier.width(260.dp).fillMaxHeight()
         )
 
         VerticalDivider(color = Color(0xFFE2E8F0), modifier = Modifier.fillMaxHeight().width(1.dp))
@@ -344,7 +346,16 @@ private fun CustomerSidebar(
                 border = BorderStroke(1.dp, PrimaryDeepBlue),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text("🗺️ Public Map Discovery", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = PrimaryDeepBlue)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = tz.mtanav.ui.components.MtanavIcons.Map,
+                        contentDescription = null,
+                        tint = PrimaryDeepBlue,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Public Map Discovery", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = PrimaryDeepBlue)
+                }
             }
 
             TextButton(
@@ -437,7 +448,7 @@ private fun CustomerOrdersContent(orders: List<OrderDto>, locationNavigator: Loc
                                 Text("Delivery address: ${ord.deliveryAddress ?: "Store pickup"}", fontSize = 12.sp, color = TextSecondary)
                                 Text("Ordered on: ${ord.createdAt}", fontSize = 11.sp, color = TextSecondary)
                             }
-                            Text("TSh ${ord.totalAmount.toInt()}", fontWeight = FontWeight.Black, color = ActionTeal, fontSize = 16.sp)
+                            Text(FormattingUtils.formatTsh(ord.totalAmount), fontWeight = FontWeight.Black, color = ActionTeal, fontSize = 16.sp)
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -457,7 +468,11 @@ private fun CustomerOrdersContent(orders: List<OrderDto>, locationNavigator: Loc
                                 },
                                 shape = RoundedCornerShape(6.dp)
                             ) {
-                                Text("NAVIGATE TO SHOP", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PrimaryDeepBlue)
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(MtanavIcons.Navigation, contentDescription = null, tint = PrimaryDeepBlue, modifier = Modifier.size(14.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("NAVIGATE TO SHOP", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PrimaryDeepBlue)
+                                }
                             }
                         }
                     }
@@ -487,7 +502,7 @@ private fun CustomerBookingsContent(bookings: List<BookingDto>, locationNavigato
                                 Text("${book.serviceName} • ${book.businessName}", fontWeight = FontWeight.Bold, fontSize = 15.sp)
                                 Text("Booking Date: ${book.bookingDate} at ${book.bookingTime}", fontSize = 12.sp, color = TextSecondary)
                             }
-                            Text("TSh ${book.price.toInt()}", fontWeight = FontWeight.Black, color = ActionTeal, fontSize = 16.sp)
+                            Text(FormattingUtils.formatTsh(book.price), fontWeight = FontWeight.Black, color = ActionTeal, fontSize = 16.sp)
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -507,7 +522,11 @@ private fun CustomerBookingsContent(bookings: List<BookingDto>, locationNavigato
                                 },
                                 shape = RoundedCornerShape(6.dp)
                             ) {
-                                Text("NAVIGATE TO SERVICE", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PrimaryDeepBlue)
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(MtanavIcons.Navigation, contentDescription = null, tint = PrimaryDeepBlue, modifier = Modifier.size(14.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("NAVIGATE TO SERVICE", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PrimaryDeepBlue)
+                                }
                             }
                         }
                     }
@@ -525,134 +544,406 @@ private fun CustomerCartContent(
     onOrderPlacedSuccess: () -> Unit
 ) {
     var deliveryOption by remember { mutableStateOf("DELIVERY") }
-    var deliveryAddress by remember { mutableStateOf("Kariakoo, Dar es Salaam") }
+    var deliveryAddress by remember { mutableStateOf("Kariakoo, Swahili Street, near Gerezani bus stop") }
     var paymentMethod by remember { mutableStateOf("M-PESA") }
     var isPlacing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-    val totalAmount = cartItems.sumOf { it.unitPrice * it.quantity }
+    val subtotalAmount = cartItems.sumOf { it.unitPrice * it.quantity }
+    val deliveryFee = if (deliveryOption == "DELIVERY") 3500.0 else 0.0
+    val totalAmount = subtotalAmount + deliveryFee
 
     if (cartItems.isEmpty()) {
-        Card(shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = SurfaceWhite), modifier = Modifier.fillMaxWidth()) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(32.dp).fillMaxWidth()) {
-                Text("🛒", fontSize = 48.sp)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Your Cart is Empty", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text("Browse products from shops on the public discovery map to add items to cart.", fontSize = 12.sp, color = TextSecondary)
+        Card(
+            shape = RoundedCornerShape(14.dp),
+            colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(36.dp).fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = MtanavIcons.ShoppingCart,
+                    contentDescription = null,
+                    tint = TextSecondary,
+                    modifier = Modifier.size(56.dp)
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text("Your Cart is Empty", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                Spacer(modifier = Modifier.height(6.dp))
+                Text("Browse products from verified shops on the public discovery map to add items to your cart.", fontSize = 13.sp, color = TextSecondary)
             }
         }
     } else {
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = SurfaceWhite), modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Text("SELECTED ITEMS SUMMARY", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
-                    Spacer(modifier = Modifier.height(12.dp))
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val isDesktop = maxWidth >= 1024.dp
+            val isMobileView = maxWidth < 768.dp
 
-                    cartItems.forEachIndexed { index, item ->
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Column {
-                                Text("${item.productName} (${item.variantName ?: "Standard"})", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                Text("${item.businessName} • Qty: ${item.quantity}", fontSize = 12.sp, color = TextSecondary)
-                            }
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Text("TSh ${(item.unitPrice * item.quantity).toInt()}", fontWeight = FontWeight.Black, color = ActionTeal)
-                                IconButton(onClick = {
-                                    val newList = cartItems.toMutableList()
-                                    newList.removeAt(index)
-                                    onCartUpdated(newList)
-                                }) {
-                                    Text("❌", fontSize = 12.sp)
-                                }
-                            }
-                        }
-                        if (index < cartItems.size - 1) HorizontalDivider(color = Color(0xFFF1F5F9), modifier = Modifier.padding(vertical = 8.dp))
-                    }
-                }
-            }
-
-            Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = SurfaceWhite), modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Text("DELIVERY & TRANSACTION METHOD", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                        Button(
-                            onClick = { deliveryOption = "DELIVERY" },
-                            colors = ButtonDefaults.buttonColors(containerColor = if (deliveryOption == "DELIVERY") PrimaryBlue else AppBackground),
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("🚚 Delivery", color = if (deliveryOption == "DELIVERY") SurfaceWhite else TextPrimary)
-                        }
-                        Button(
-                            onClick = { deliveryOption = "PICKUP" },
-                            colors = ButtonDefaults.buttonColors(containerColor = if (deliveryOption == "PICKUP") PrimaryBlue else AppBackground),
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("🏪 Store Pickup", color = if (deliveryOption == "PICKUP") SurfaceWhite else TextPrimary)
-                        }
-                    }
-
-                    if (deliveryOption == "DELIVERY") {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        OutlinedTextField(
-                            value = deliveryAddress,
-                            onValueChange = { deliveryAddress = it },
-                            label = { Text("Delivery Address") },
+            if (isDesktop) {
+                // DESKTOP TWO-COLUMN SPLIT (>= 1024px)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    // Left Column: 60%
+                    Column(
+                        modifier = Modifier.weight(0.6f),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        // Fulfillment option card
+                        Card(
+                            shape = RoundedCornerShape(14.dp),
+                            colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("PAYMENT METHOD", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-                        listOf("M-PESA", "TIGO PESA", "AIRTEL", "CASH").forEach { method ->
-                            val isSelected = paymentMethod == method
-                            Button(
-                                onClick = { paymentMethod = method },
-                                colors = ButtonDefaults.buttonColors(containerColor = if (isSelected) ActionTeal else AppBackground),
-                                shape = RoundedCornerShape(6.dp),
-                                modifier = Modifier.weight(1f),
-                                contentPadding = PaddingValues(4.dp)
-                            ) {
-                                Text(method, color = if (isSelected) SurfaceWhite else TextPrimary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Column {
-                            Text("Total Amount Due:", fontSize = 12.sp, color = TextSecondary)
-                            Text("TSh ${totalAmount.toInt()}", fontSize = 22.sp, fontWeight = FontWeight.Black, color = ActionTeal)
-                        }
-
-                        Button(
-                            onClick = {
-                                coroutineScope.launch {
-                                    isPlacing = true
-                                    try {
-                                        repository.placeOrder(cartItems, deliveryAddress, deliveryOption)
-                                        onOrderPlacedSuccess()
-                                    } catch (_: Exception) {
-                                    } finally {
-                                        isPlacing = false
+                        ) {
+                            Column(modifier = Modifier.padding(20.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(MtanavIcons.LocalShipping, contentDescription = null, tint = PrimaryDeepBlue, modifier = Modifier.size(20.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("DELIVERY METHOD", fontSize = 12.sp, fontWeight = FontWeight.Black, color = PrimaryDeepBlue, letterSpacing = 1.sp)
+                                }
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                                    Button(
+                                        onClick = { deliveryOption = "DELIVERY" },
+                                        colors = ButtonDefaults.buttonColors(containerColor = if (deliveryOption == "DELIVERY") PrimaryDeepBlue else AppBackground),
+                                        shape = RoundedCornerShape(8.dp),
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(MtanavIcons.LocalShipping, contentDescription = null, tint = if (deliveryOption == "DELIVERY") SurfaceWhite else TextPrimary, modifier = Modifier.size(16.dp))
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text("Delivery (${FormattingUtils.formatTsh(3500.0)})", color = if (deliveryOption == "DELIVERY") SurfaceWhite else TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                        }
+                                    }
+                                    Button(
+                                        onClick = { deliveryOption = "PICKUP" },
+                                        colors = ButtonDefaults.buttonColors(containerColor = if (deliveryOption == "PICKUP") PrimaryDeepBlue else AppBackground),
+                                        shape = RoundedCornerShape(8.dp),
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(MtanavIcons.Storefront, contentDescription = null, tint = if (deliveryOption == "PICKUP") SurfaceWhite else TextPrimary, modifier = Modifier.size(16.dp))
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text("Store Pickup (Free)", color = if (deliveryOption == "PICKUP") SurfaceWhite else TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                        }
                                     }
                                 }
-                            },
-                            enabled = !isPlacing,
-                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryDeepBlue),
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier.height(50.dp)
+
+                                if (deliveryOption == "DELIVERY") {
+                                    Spacer(modifier = Modifier.height(14.dp))
+                                    OutlinedTextField(
+                                        value = deliveryAddress,
+                                        onValueChange = { deliveryAddress = it },
+                                        label = { Text("Delivery Address (Landmark Guidance)") },
+                                        placeholder = { Text("e.g., Kariakoo, Swahili Street, near Gerezani bus stop", fontSize = 12.sp) },
+                                        leadingIcon = { Icon(MtanavIcons.LocationOn, contentDescription = null, tint = ActionTeal) },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = RoundedCornerShape(10.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        // Payment Methods card
+                        Card(
+                            shape = RoundedCornerShape(14.dp),
+                            colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            if (isPlacing) {
-                                CircularProgressIndicator(modifier = Modifier.size(20.dp), color = SurfaceWhite, strokeWidth = 2.dp)
+                            Column(modifier = Modifier.padding(20.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(MtanavIcons.CheckCircle, contentDescription = null, tint = ActionTeal, modifier = Modifier.size(20.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("PAYMENT METHOD", fontSize = 12.sp, fontWeight = FontWeight.Black, color = PrimaryDeepBlue, letterSpacing = 1.sp)
+                                }
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                                    listOf("M-PESA", "TIGO PESA", "AIRTEL", "CASH").forEach { method ->
+                                        val isSelected = paymentMethod.equals(method, ignoreCase = true)
+                                        Button(
+                                            onClick = { paymentMethod = method },
+                                            colors = ButtonDefaults.buttonColors(containerColor = if (isSelected) ActionTeal else AppBackground),
+                                            shape = RoundedCornerShape(8.dp),
+                                            modifier = Modifier.weight(1f),
+                                            contentPadding = PaddingValues(vertical = 10.dp)
+                                        ) {
+                                            Text(method, color = if (isSelected) SurfaceWhite else TextPrimary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Right Column: 40% (Sticky Order Summary)
+                    Column(
+                        modifier = Modifier.weight(0.4f),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Card(
+                            shape = RoundedCornerShape(14.dp),
+                            colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(modifier = Modifier.padding(20.dp)) {
+                                Text("SELECTED ITEMS SUMMARY", fontSize = 12.sp, fontWeight = FontWeight.Black, color = PrimaryDeepBlue, letterSpacing = 1.sp)
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                cartItems.forEachIndexed { index, item ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(item.productName, fontWeight = FontWeight.Bold, fontSize = 13.5.sp, color = TextPrimary)
+                                            Text("Qty: ${item.quantity} • ${item.businessName}", fontSize = 11.5.sp, color = TextSecondary)
+                                        }
+                                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                            Text(FormattingUtils.formatTsh(item.unitPrice * item.quantity), fontWeight = FontWeight.Black, color = ActionTeal, fontSize = 13.5.sp)
+                                            IconButton(
+                                                onClick = {
+                                                    val newList = cartItems.toMutableList()
+                                                    newList.removeAt(index)
+                                                    onCartUpdated(newList)
+                                                },
+                                                modifier = Modifier.size(24.dp)
+                                            ) {
+                                                Icon(MtanavIcons.Close, contentDescription = "Remove", tint = ErrorRed, modifier = Modifier.size(16.dp))
+                                            }
+                                        }
+                                    }
+                                    if (index < cartItems.size - 1) HorizontalDivider(color = Color(0xFFF1F5F9), modifier = Modifier.padding(vertical = 8.dp))
+                                }
+
+                                HorizontalDivider(color = Color(0xFFE2E8F0), modifier = Modifier.padding(vertical = 12.dp))
+
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text("Subtotal", fontSize = 12.5.sp, color = TextSecondary)
+                                    Text(FormattingUtils.formatTsh(subtotalAmount), fontSize = 12.5.sp, fontWeight = FontWeight.Medium)
+                                }
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text("Delivery Fee", fontSize = 12.5.sp, color = TextSecondary)
+                                    Text(if (deliveryFee > 0) FormattingUtils.formatTsh(deliveryFee) else "Free", fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = if (deliveryFee > 0) TextPrimary else ActionTeal)
+                                }
+
+                                HorizontalDivider(color = Color(0xFFE2E8F0), modifier = Modifier.padding(vertical = 12.dp))
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("Total Amount Due", fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                                    Text(FormattingUtils.formatTsh(totalAmount), fontSize = 18.sp, fontWeight = FontWeight.Black, color = ActionTeal)
+                                }
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Button(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            isPlacing = true
+                                            try {
+                                                repository.placeOrder(cartItems, deliveryAddress, deliveryOption)
+                                                onOrderPlacedSuccess()
+                                            } catch (_: Exception) {
+                                            } finally {
+                                                isPlacing = false
+                                            }
+                                        }
+                                    },
+                                    enabled = !isPlacing,
+                                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryDeepBlue),
+                                    shape = RoundedCornerShape(10.dp),
+                                    modifier = Modifier.fillMaxWidth().height(48.dp)
+                                ) {
+                                    if (isPlacing) {
+                                        CircularProgressIndicator(modifier = Modifier.size(20.dp), color = SurfaceWhite, strokeWidth = 2.dp)
+                                    } else {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(MtanavIcons.CheckCircle, contentDescription = null, tint = HighlightGold, modifier = Modifier.size(16.dp))
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text("CONFIRM & PAY TRANSACTION", fontWeight = FontWeight.Black, fontSize = 12.5.sp)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                // MOBILE / TABLET LAYOUT (< 1024px)
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    // Selected items card
+                    Card(
+                        shape = RoundedCornerShape(14.dp),
+                        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text("SELECTED ITEMS SUMMARY", fontSize = 12.sp, fontWeight = FontWeight.Black, color = PrimaryDeepBlue, letterSpacing = 1.sp)
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            cartItems.forEachIndexed { index, item ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text("${item.productName} (${item.variantName ?: "Standard"})", fontWeight = FontWeight.Bold, fontSize = 13.5.sp)
+                                        Text("${item.businessName} • Qty: ${item.quantity}", fontSize = 11.5.sp, color = TextSecondary)
+                                    }
+                                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                        Text(FormattingUtils.formatTsh(item.unitPrice * item.quantity), fontWeight = FontWeight.Black, color = ActionTeal, fontSize = 13.5.sp)
+                                        IconButton(
+                                            onClick = {
+                                                val newList = cartItems.toMutableList()
+                                                newList.removeAt(index)
+                                                onCartUpdated(newList)
+                                            },
+                                            modifier = Modifier.size(24.dp)
+                                        ) {
+                                            Icon(MtanavIcons.Close, contentDescription = "Remove", tint = ErrorRed, modifier = Modifier.size(16.dp))
+                                        }
+                                    }
+                                }
+                                if (index < cartItems.size - 1) HorizontalDivider(color = Color(0xFFF1F5F9), modifier = Modifier.padding(vertical = 8.dp))
+                            }
+                        }
+                    }
+
+                    // Delivery & Payment card
+                    Card(
+                        shape = RoundedCornerShape(14.dp),
+                        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text("DELIVERY METHOD", fontSize = 12.sp, fontWeight = FontWeight.Black, color = PrimaryDeepBlue, letterSpacing = 1.sp)
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                                Button(
+                                    onClick = { deliveryOption = "DELIVERY" },
+                                    colors = ButtonDefaults.buttonColors(containerColor = if (deliveryOption == "DELIVERY") PrimaryDeepBlue else AppBackground),
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("Delivery (${FormattingUtils.formatTsh(3500.0)})", color = if (deliveryOption == "DELIVERY") SurfaceWhite else TextPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                }
+                                Button(
+                                    onClick = { deliveryOption = "PICKUP" },
+                                    colors = ButtonDefaults.buttonColors(containerColor = if (deliveryOption == "PICKUP") PrimaryDeepBlue else AppBackground),
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("Store Pickup (Free)", color = if (deliveryOption == "PICKUP") SurfaceWhite else TextPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
+
+                            if (deliveryOption == "DELIVERY") {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                OutlinedTextField(
+                                    value = deliveryAddress,
+                                    onValueChange = { deliveryAddress = it },
+                                    label = { Text("Delivery Address (Landmark Guidance)") },
+                                    placeholder = { Text("e.g., Kariakoo, Swahili Street, near Gerezani bus stop", fontSize = 11.5.sp) },
+                                    leadingIcon = { Icon(MtanavIcons.LocationOn, contentDescription = null, tint = ActionTeal) },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(14.dp))
+                            Text("PAYMENT METHOD", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            if (isMobileView) {
+                                // 2x2 GRID FOR MOBILE VIEWPORTS (< 768px)
+                                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    val methods = listOf("M-PESA", "TIGO PESA", "AIRTEL", "CASH")
+                                    for (r in 0..1) {
+                                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+                                            for (c in 0..1) {
+                                                val method = methods[r * 2 + c]
+                                                val isSelected = paymentMethod.equals(method, ignoreCase = true)
+                                                Button(
+                                                    onClick = { paymentMethod = method },
+                                                    colors = ButtonDefaults.buttonColors(containerColor = if (isSelected) ActionTeal else AppBackground),
+                                                    shape = RoundedCornerShape(6.dp),
+                                                    modifier = Modifier.weight(1f),
+                                                    contentPadding = PaddingValues(8.dp)
+                                                ) {
+                                                    Text(method, color = if (isSelected) SurfaceWhite else TextPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             } else {
-                                Text("CONFIRM & PAY TRANSACTION", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+                                    listOf("M-PESA", "TIGO PESA", "AIRTEL", "CASH").forEach { method ->
+                                        val isSelected = paymentMethod.equals(method, ignoreCase = true)
+                                        Button(
+                                            onClick = { paymentMethod = method },
+                                            colors = ButtonDefaults.buttonColors(containerColor = if (isSelected) ActionTeal else AppBackground),
+                                            shape = RoundedCornerShape(6.dp),
+                                            modifier = Modifier.weight(1f),
+                                            contentPadding = PaddingValues(6.dp)
+                                        ) {
+                                            Text(method, color = if (isSelected) SurfaceWhite else TextPrimary, fontSize = 10.5.sp, fontWeight = FontWeight.Bold)
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(18.dp))
+
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                Column {
+                                    Text("Total Amount Due:", fontSize = 12.sp, color = TextSecondary)
+                                    Text(FormattingUtils.formatTsh(totalAmount), fontSize = 20.sp, fontWeight = FontWeight.Black, color = ActionTeal)
+                                }
+
+                                Button(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            isPlacing = true
+                                            try {
+                                                repository.placeOrder(cartItems, deliveryAddress, deliveryOption)
+                                                onOrderPlacedSuccess()
+                                            } catch (_: Exception) {
+                                            } finally {
+                                                isPlacing = false
+                                            }
+                                        }
+                                    },
+                                    enabled = !isPlacing,
+                                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryDeepBlue),
+                                    shape = RoundedCornerShape(10.dp),
+                                    modifier = Modifier.height(48.dp)
+                                ) {
+                                    if (isPlacing) {
+                                        CircularProgressIndicator(modifier = Modifier.size(20.dp), color = SurfaceWhite, strokeWidth = 2.dp)
+                                    } else {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(MtanavIcons.CheckCircle, contentDescription = null, tint = HighlightGold, modifier = Modifier.size(16.dp))
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text("CONFIRM & PAY TRANSACTION", fontWeight = FontWeight.Bold, fontSize = 12.5.sp)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

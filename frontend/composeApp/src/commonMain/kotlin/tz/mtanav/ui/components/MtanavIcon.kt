@@ -1,68 +1,785 @@
 package tz.mtanav.ui.components
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.path
+import androidx.compose.ui.unit.dp
+
+private fun buildSvgIcon(
+    name: String,
+    pathBuilder: androidx.compose.ui.graphics.vector.PathBuilder.() -> Unit
+): ImageVector {
+    return ImageVector.Builder(
+        name = name,
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).path(
+        fill = SolidColor(Color.White),
+        pathBuilder = pathBuilder
+    ).build()
+}
 
 object MtanavIcons {
-    val Search: ImageVector = Icons.Default.Search
-    val Close: ImageVector = Icons.Default.Close
-    val Menu: ImageVector = Icons.Default.Menu
-    val ArrowBack: ImageVector = Icons.AutoMirrored.Filled.ArrowBack
-    val ArrowForward: ImageVector = Icons.AutoMirrored.Filled.ArrowForward
-    val ShoppingCart: ImageVector = Icons.Default.ShoppingCart
-    val ShoppingBag: ImageVector = Icons.Default.ShoppingCart
-    val Storefront: ImageVector = Icons.Default.Home
-    val LocationOn: ImageVector = Icons.Default.LocationOn
-    val Phone: ImageVector = Icons.Default.Phone
-    val Email: ImageVector = Icons.Default.Email
-    val LocalShipping: ImageVector = Icons.Default.ShoppingCart
-    val Work: ImageVector = Icons.Default.Place
-    val LocalOffer: ImageVector = Icons.Default.Star
-    val Star: ImageVector = Icons.Default.Star
-    val Person: ImageVector = Icons.Default.Person
-    val Lock: ImageVector = Icons.Default.Lock
-    val ExitToApp: ImageVector = Icons.AutoMirrored.Filled.ArrowForward
-    val Check: ImageVector = Icons.Default.Check
-    val CheckCircle: ImageVector = Icons.Default.CheckCircle
-    val Build: ImageVector = Icons.Default.Settings
-    val FilterList: ImageVector = Icons.Default.Search
-    val Map: ImageVector = Icons.Default.Place
-    val Navigation: ImageVector = Icons.Default.LocationOn
+    val Search: ImageVector = buildSvgIcon("Search") {
+        moveTo(15.5f, 14f)
+        horizontalLineTo(14.71f)
+        lineTo(14.43f, 13.73f)
+        curveTo(15.41f, 12.59f, 16f, 11.11f, 16f, 9.5f)
+        curveTo(16f, 5.91f, 13.09f, 3f, 9.5f, 3f)
+        curveTo(5.91f, 3f, 3f, 5.91f, 3f, 9.5f)
+        curveTo(3f, 13.09f, 5.91f, 16f, 9.5f, 16f)
+        curveTo(11.11f, 16f, 12.59f, 15.41f, 13.73f, 14.43f)
+        lineTo(14.01f, 14.71f)
+        verticalLineTo(15.5f)
+        lineTo(19f, 20.49f)
+        lineTo(20.49f, 19f)
+        lineTo(15.5f, 14f)
+        close()
+        moveTo(9.5f, 14f)
+        curveTo(7.01f, 14f, 5f, 11.99f, 5f, 9.5f)
+        curveTo(5f, 7.01f, 7.01f, 5f, 9.5f, 5f)
+        curveTo(11.99f, 5f, 14f, 7.01f, 14f, 9.5f)
+        curveTo(14f, 11.99f, 11.99f, 14f, 9.5f, 14f)
+        close()
+    }
+
+    val Close: ImageVector = buildSvgIcon("Close") {
+        moveTo(19f, 6.41f)
+        lineTo(17.59f, 5f)
+        lineTo(12f, 10.59f)
+        lineTo(6.41f, 5f)
+        lineTo(5f, 6.41f)
+        lineTo(10.59f, 12f)
+        lineTo(5f, 17.59f)
+        lineTo(6.41f, 19f)
+        lineTo(12f, 13.41f)
+        lineTo(17.59f, 19f)
+        lineTo(19f, 17.59f)
+        lineTo(13.41f, 12f)
+        close()
+    }
+
+    val Clear: ImageVector = Close
+
+    val Menu: ImageVector = buildSvgIcon("Menu") {
+        moveTo(3f, 18f)
+        horizontalLineTo(21f)
+        verticalLineTo(16f)
+        horizontalLineTo(3f)
+        verticalLineTo(18f)
+        close()
+        moveTo(3f, 13f)
+        horizontalLineTo(21f)
+        verticalLineTo(11f)
+        horizontalLineTo(3f)
+        verticalLineTo(13f)
+        close()
+        moveTo(3f, 6f)
+        verticalLineTo(8f)
+        horizontalLineTo(21f)
+        verticalLineTo(6f)
+        horizontalLineTo(3f)
+        close()
+    }
+
+    val ArrowBack: ImageVector = buildSvgIcon("ArrowBack") {
+        moveTo(20f, 11f)
+        horizontalLineTo(7.83f)
+        lineTo(13.42f, 5.41f)
+        lineTo(12f, 4f)
+        lineTo(4f, 12f)
+        lineTo(12f, 20f)
+        lineTo(13.41f, 18.59f)
+        lineTo(7.83f, 13f)
+        horizontalLineTo(20f)
+        verticalLineTo(11f)
+        close()
+    }
+
+    val ArrowForward: ImageVector = buildSvgIcon("ArrowForward") {
+        moveTo(12f, 4f)
+        lineTo(10.59f, 5.41f)
+        lineTo(16.17f, 11f)
+        horizontalLineTo(4f)
+        verticalLineTo(13f)
+        horizontalLineTo(16.17f)
+        lineTo(10.59f, 18.59f)
+        lineTo(12f, 20f)
+        lineTo(20f, 12f)
+        close()
+    }
+
+    val ShoppingCart: ImageVector = buildSvgIcon("ShoppingCart") {
+        moveTo(7f, 18f)
+        curveTo(5.9f, 18f, 5.01f, 18.9f, 5.01f, 20f)
+        curveTo(5.01f, 21.1f, 5.9f, 22f, 7f, 22f)
+        curveTo(8.1f, 22f, 9f, 21.1f, 9f, 20f)
+        curveTo(9f, 18.9f, 8.1f, 18f, 7f, 18f)
+        close()
+        moveTo(1f, 2f)
+        verticalLineTo(4f)
+        horizontalLineTo(3f)
+        lineTo(6.6f, 11.59f)
+        lineTo(5.25f, 14.04f)
+        curveTo(5.09f, 14.32f, 5f, 14.65f, 5f, 15f)
+        curveTo(5f, 16.1f, 5.9f, 17f, 7f, 17f)
+        horizontalLineTo(19f)
+        verticalLineTo(15f)
+        horizontalLineTo(7.42f)
+        curveTo(7.28f, 15f, 7.17f, 14.89f, 7.17f, 14.75f)
+        lineTo(7.2f, 14.63f)
+        lineTo(8.1f, 13f)
+        horizontalLineTo(15.55f)
+        curveTo(16.3f, 13f, 16.96f, 12.59f, 17.3f, 11.97f)
+        lineTo(20.88f, 5.48f)
+        curveTo(20.96f, 5.34f, 21f, 5.17f, 21f, 5f)
+        curveTo(21f, 4.45f, 20.55f, 4f, 20f, 4f)
+        horizontalLineTo(5.21f)
+        lineTo(4.27f, 2f)
+        close()
+        moveTo(17f, 18f)
+        curveTo(15.9f, 18f, 15.01f, 18.9f, 15.01f, 20f)
+        curveTo(15.01f, 21.1f, 15.9f, 22f, 17f, 22f)
+        curveTo(18.1f, 22f, 19f, 21.1f, 19f, 20f)
+        curveTo(19f, 18.9f, 18.1f, 18f, 17f, 18f)
+        close()
+    }
+
+    val ShoppingBag: ImageVector = ShoppingCart
+
+    val Storefront: ImageVector = buildSvgIcon("Storefront") {
+        moveTo(10f, 20f)
+        verticalLineTo(14f)
+        horizontalLineTo(14f)
+        verticalLineTo(20f)
+        horizontalLineTo(19f)
+        verticalLineTo(12f)
+        horizontalLineTo(22f)
+        lineTo(12f, 3f)
+        lineTo(2f, 12f)
+        horizontalLineTo(5f)
+        verticalLineTo(20f)
+        close()
+    }
+
+    val LocationOn: ImageVector = buildSvgIcon("LocationOn") {
+        moveTo(12f, 2f)
+        curveTo(8.13f, 2f, 5f, 5.13f, 5f, 9f)
+        curveTo(5f, 14.25f, 12f, 22f, 12f, 22f)
+        curveTo(12f, 22f, 19f, 14.25f, 19f, 9f)
+        curveTo(19f, 5.13f, 15.87f, 2f, 12f, 2f)
+        close()
+        moveTo(12f, 11.5f)
+        curveTo(10.62f, 11.5f, 9.5f, 10.38f, 9.5f, 9f)
+        curveTo(9.5f, 7.62f, 10.62f, 6.5f, 12f, 6.5f)
+        curveTo(13.38f, 6.5f, 14.5f, 7.62f, 14.5f, 9f)
+        curveTo(14.5f, 10.38f, 13.38f, 11.5f, 12f, 11.5f)
+        close()
+    }
+
+    val Phone: ImageVector = buildSvgIcon("Phone") {
+        moveTo(6.62f, 10.79f)
+        curveTo(8.06f, 13.62f, 10.38f, 15.94f, 13.21f, 17.38f)
+        lineTo(15.41f, 15.18f)
+        curveTo(15.69f, 14.9f, 16.08f, 14.82f, 16.43f, 14.93f)
+        curveTo(17.55f, 15.3f, 18.75f, 15.5f, 20f, 15.5f)
+        curveTo(20.55f, 15.5f, 21f, 15.95f, 21f, 16.5f)
+        verticalLineTo(20f)
+        curveTo(21f, 20.55f, 20.55f, 21f, 20f, 21f)
+        curveTo(9.5f, 21f, 3f, 14.5f, 3f, 4f)
+        curveTo(3f, 3.45f, 3.45f, 3f, 4f, 3f)
+        horizontalLineTo(7.5f)
+        curveTo(8.05f, 3f, 8.5f, 3.45f, 8.5f, 4f)
+        curveTo(8.5f, 5.25f, 8.7f, 6.45f, 9.07f, 7.57f)
+        curveTo(9.18f, 7.92f, 9.1f, 8.31f, 8.82f, 8.59f)
+        lineTo(6.62f, 10.79f)
+        close()
+    }
+
+    val Email: ImageVector = buildSvgIcon("Email") {
+        moveTo(20f, 4f)
+        horizontalLineTo(4f)
+        curveTo(2.9f, 4f, 2.01f, 4.9f, 2.01f, 6f)
+        lineTo(2f, 18f)
+        curveTo(2f, 19.1f, 2.9f, 20f, 4f, 20f)
+        horizontalLineTo(20f)
+        curveTo(21.1f, 20f, 22f, 19.1f, 22f, 18f)
+        verticalLineTo(6f)
+        curveTo(22f, 4.9f, 21.1f, 4f, 20f, 4f)
+        close()
+        moveTo(20f, 8f)
+        lineTo(12f, 13f)
+        lineTo(4f, 8f)
+        verticalLineTo(6f)
+        lineTo(12f, 11f)
+        lineTo(20f, 6f)
+        verticalLineTo(8f)
+        close()
+    }
+
+    val LocalShipping: ImageVector = ShoppingCart
+
+    val Work: ImageVector = buildSvgIcon("Work") {
+        moveTo(20f, 6f)
+        horizontalLineTo(16f)
+        verticalLineTo(4f)
+        curveTo(16f, 2.89f, 15.11f, 2f, 14f, 2f)
+        horizontalLineTo(10f)
+        curveTo(8.89f, 2f, 8f, 2.89f, 8f, 4f)
+        verticalLineTo(6f)
+        horizontalLineTo(4f)
+        curveTo(2.89f, 6f, 2.01f, 6.89f, 2.01f, 8f)
+        lineTo(2f, 19f)
+        curveTo(2f, 20.11f, 2.89f, 21f, 4f, 21f)
+        horizontalLineTo(20f)
+        curveTo(21.11f, 21f, 22f, 20.11f, 22f, 19f)
+        verticalLineTo(8f)
+        curveTo(22f, 6.89f, 21.11f, 6f, 20f, 6f)
+        close()
+        moveTo(14f, 6f)
+        horizontalLineTo(10f)
+        verticalLineTo(4f)
+        horizontalLineTo(14f)
+        verticalLineTo(6f)
+        close()
+    }
+
+    val LocalOffer: ImageVector = buildSvgIcon("LocalOffer") {
+        moveTo(21.41f, 11.58f)
+        lineTo(12.41f, 2.58f)
+        curveTo(12.05f, 2.22f, 11.55f, 2f, 11f, 2f)
+        horizontalLineTo(4f)
+        curveTo(2.9f, 2f, 2f, 2.9f, 2f, 4f)
+        verticalLineTo(11f)
+        curveTo(2f, 11.55f, 2.22f, 12.05f, 2.59f, 12.42f)
+        lineTo(11.59f, 21.42f)
+        curveTo(11.95f, 21.78f, 12.45f, 22f, 13f, 22f)
+        curveTo(13.55f, 22f, 14.05f, 21.78f, 14.41f, 21.41f)
+        lineTo(21.41f, 14.41f)
+        curveTo(21.78f, 14.05f, 22f, 13.55f, 22f, 13f)
+        curveTo(22f, 12.45f, 21.77f, 11.94f, 21.41f, 11.58f)
+        close()
+        moveTo(5.5f, 7f)
+        curveTo(4.67f, 7f, 4f, 6.33f, 4f, 5.5f)
+        curveTo(4f, 4.67f, 4.67f, 4f, 5.5f, 4f)
+        curveTo(6.33f, 4f, 7f, 4.67f, 7f, 5.5f)
+        curveTo(7f, 6.33f, 6.33f, 7f, 5.5f, 7f)
+        close()
+    }
+
+    val Star: ImageVector = buildSvgIcon("Star") {
+        moveTo(12f, 17.27f)
+        lineTo(18.18f, 21f)
+        lineTo(16.54f, 13.97f)
+        lineTo(22f, 9.24f)
+        lineTo(14.81f, 8.63f)
+        lineTo(12f, 2f)
+        lineTo(9.19f, 8.63f)
+        lineTo(2f, 9.24f)
+        lineTo(7.46f, 13.97f)
+        lineTo(5.82f, 21f)
+        close()
+    }
+
+    val Person: ImageVector = buildSvgIcon("Person") {
+        moveTo(12f, 12f)
+        curveTo(14.21f, 12f, 16f, 10.21f, 16f, 8f)
+        curveTo(16f, 5.79f, 14.21f, 4f, 12f, 4f)
+        curveTo(9.79f, 4f, 8f, 5.79f, 8f, 8f)
+        curveTo(8f, 10.21f, 9.79f, 12f, 12f, 12f)
+        close()
+        moveTo(12f, 14f)
+        curveTo(9.33f, 14f, 4f, 15.34f, 4f, 18f)
+        verticalLineTo(20f)
+        horizontalLineTo(20f)
+        verticalLineTo(18f)
+        curveTo(20f, 15.34f, 14.67f, 14f, 12f, 14f)
+        close()
+    }
+
+    val Lock: ImageVector = buildSvgIcon("Lock") {
+        moveTo(18f, 8f)
+        horizontalLineTo(17f)
+        verticalLineTo(6f)
+        curveTo(17f, 3.24f, 14.76f, 1f, 12f, 1f)
+        curveTo(9.24f, 1f, 7f, 3.24f, 7f, 6f)
+        verticalLineTo(8f)
+        horizontalLineTo(6f)
+        curveTo(4.9f, 8f, 4f, 8.9f, 4f, 10f)
+        verticalLineTo(20f)
+        curveTo(4f, 21.1f, 4.9f, 22f, 6f, 22f)
+        horizontalLineTo(18f)
+        curveTo(19.1f, 22f, 20f, 21.1f, 20f, 20f)
+        verticalLineTo(10f)
+        curveTo(20f, 8.9f, 19.1f, 8f, 18f, 8f)
+        close()
+        moveTo(12f, 17f)
+        curveTo(10.9f, 17f, 10f, 16.1f, 10f, 15f)
+        curveTo(10f, 13.9f, 10.9f, 13f, 12f, 13f)
+        curveTo(13.1f, 13f, 14f, 13.9f, 14f, 15f)
+        curveTo(14f, 16.1f, 13.1f, 17f, 12f, 17f)
+        close()
+        moveTo(15.1f, 8f)
+        horizontalLineTo(8.9f)
+        verticalLineTo(6f)
+        curveTo(8.9f, 4.29f, 10.29f, 2.9f, 12f, 2.9f)
+        curveTo(13.71f, 2.9f, 15.1f, 4.29f, 15.1f, 6f)
+        verticalLineTo(8f)
+        close()
+    }
+
+    val ExitToApp: ImageVector = buildSvgIcon("ExitToApp") {
+        moveTo(10.09f, 15.59f)
+        lineTo(11.5f, 17f)
+        lineTo(16.5f, 12f)
+        lineTo(11.5f, 7f)
+        lineTo(10.09f, 8.41f)
+        lineTo(12.67f, 11f)
+        horizontalLineTo(3f)
+        verticalLineTo(13f)
+        horizontalLineTo(12.67f)
+        lineTo(10.09f, 15.59f)
+        close()
+        moveTo(19f, 3f)
+        horizontalLineTo(5f)
+        curveTo(3.89f, 3f, 3f, 3.9f, 3f, 5f)
+        verticalLineTo(9f)
+        horizontalLineTo(5f)
+        verticalLineTo(5f)
+        horizontalLineTo(19f)
+        verticalLineTo(19f)
+        horizontalLineTo(5f)
+        verticalLineTo(15f)
+        horizontalLineTo(3f)
+        verticalLineTo(19f)
+        curveTo(3f, 20.1f, 3.89f, 21f, 5f, 21f)
+        horizontalLineTo(19f)
+        curveTo(20.1f, 21f, 21f, 20.1f, 21f, 19f)
+        verticalLineTo(5f)
+        curveTo(21f, 3.9f, 20.1f, 3f, 19f, 3f)
+        close()
+    }
+
+    val Check: ImageVector = buildSvgIcon("Check") {
+        moveTo(9f, 16.17f)
+        lineTo(4.83f, 12f)
+        lineTo(3.41f, 13.41f)
+        lineTo(9f, 19f)
+        lineTo(21f, 7f)
+        lineTo(19.59f, 5.59f)
+        close()
+    }
+
+    val CheckCircle: ImageVector = buildSvgIcon("CheckCircle") {
+        moveTo(12f, 2f)
+        curveTo(6.48f, 2f, 2f, 6.48f, 2f, 12f)
+        curveTo(2f, 17.52f, 6.48f, 22f, 12f, 22f)
+        curveTo(17.52f, 22f, 22f, 17.52f, 22f, 12f)
+        curveTo(22f, 6.48f, 17.52f, 2f, 12f, 2f)
+        close()
+        moveTo(10f, 17f)
+        lineTo(5f, 12f)
+        lineTo(6.41f, 10.59f)
+        lineTo(10f, 14.17f)
+        lineTo(17.59f, 6.58f)
+        lineTo(19f, 8f)
+        lineTo(10f, 17f)
+        close()
+    }
+
+    val Build: ImageVector = buildSvgIcon("Build") {
+        moveTo(19.43f, 12.98f)
+        curveTo(19.47f, 12.66f, 19.5f, 12.34f, 19.5f, 12f)
+        curveTo(19.5f, 11.66f, 19.47f, 11.34f, 19.43f, 11.02f)
+        lineTo(21.54f, 9.37f)
+        curveTo(21.73f, 9.22f, 21.78f, 8.95f, 21.66f, 8.73f)
+        lineTo(19.66f, 5.27f)
+        curveTo(19.54f, 5.05f, 19.27f, 4.97f, 19.05f, 5.05f)
+        lineTo(16.56f, 6.05f)
+        curveTo(16.04f, 5.65f, 15.48f, 5.32f, 14.87f, 5.07f)
+        lineTo(14.49f, 2.42f)
+        curveTo(14.46f, 2.18f, 14.25f, 2f, 14f, 2f)
+        horizontalLineTo(10f)
+        curveTo(9.75f, 2f, 9.54f, 2.18f, 9.51f, 2.42f)
+        lineTo(9.13f, 5.07f)
+        curveTo(8.52f, 5.32f, 7.96f, 5.66f, 7.44f, 6.05f)
+        lineTo(4.95f, 5.05f)
+        curveTo(4.72f, 4.96f, 4.46f, 5.05f, 4.34f, 5.27f)
+        lineTo(2.34f, 8.73f)
+        curveTo(2.21f, 8.95f, 2.27f, 9.22f, 2.46f, 9.37f)
+        lineTo(4.57f, 11.02f)
+        curveTo(4.53f, 11.34f, 4.5f, 11.67f, 4.5f, 12f)
+        curveTo(4.5f, 12.33f, 4.53f, 12.66f, 4.57f, 12.98f)
+        lineTo(2.46f, 14.63f)
+        curveTo(2.27f, 14.78f, 2.21f, 15.05f, 2.34f, 15.27f)
+        lineTo(4.34f, 18.73f)
+        curveTo(4.46f, 18.95f, 4.73f, 19.03f, 4.95f, 18.95f)
+        lineTo(7.44f, 17.95f)
+        curveTo(7.96f, 18.35f, 8.52f, 18.68f, 9.13f, 18.93f)
+        lineTo(9.51f, 21.58f)
+        curveTo(9.54f, 21.82f, 9.75f, 22f, 10f, 22f)
+        horizontalLineTo(14f)
+        curveTo(14.25f, 22f, 14.46f, 21.82f, 14.49f, 21.58f)
+        lineTo(14.87f, 18.93f)
+        curveTo(15.48f, 18.68f, 16.04f, 18.34f, 16.56f, 17.95f)
+        lineTo(19.05f, 18.95f)
+        curveTo(19.28f, 19.04f, 19.54f, 18.95f, 19.66f, 18.73f)
+        lineTo(21.66f, 15.27f)
+        curveTo(21.78f, 15.05f, 21.73f, 14.78f, 21.54f, 14.63f)
+        lineTo(19.43f, 12.98f)
+        close()
+        moveTo(12f, 15.5f)
+        curveTo(10.07f, 15.5f, 8.5f, 13.93f, 8.5f, 12f)
+        curveTo(8.5f, 10.07f, 10.07f, 8.5f, 12f, 8.5f)
+        curveTo(13.93f, 8.5f, 15.5f, 10.07f, 15.5f, 12f)
+        curveTo(15.5f, 13.93f, 13.93f, 15.5f, 12f, 15.5f)
+        close()
+    }
+
+    val FilterList: ImageVector = Search
+    val Map: ImageVector = LocationOn
+    val Navigation: ImageVector = LocationOn
+
+    val Add: ImageVector = buildSvgIcon("Add") {
+        moveTo(19f, 13f)
+        horizontalLineTo(13f)
+        verticalLineTo(19f)
+        horizontalLineTo(11f)
+        verticalLineTo(13f)
+        horizontalLineTo(5f)
+        verticalLineTo(11f)
+        horizontalLineTo(11f)
+        verticalLineTo(5f)
+        horizontalLineTo(13f)
+        verticalLineTo(11f)
+        horizontalLineTo(19f)
+        verticalLineTo(13f)
+        close()
+    }
+
+    val Delete: ImageVector = buildSvgIcon("Delete") {
+        moveTo(6f, 19f)
+        curveTo(6f, 20.1f, 6.9f, 21f, 8f, 21f)
+        horizontalLineTo(16f)
+        curveTo(17.1f, 21f, 18f, 20.1f, 18f, 19f)
+        verticalLineTo(7f)
+        horizontalLineTo(6f)
+        verticalLineTo(19f)
+        close()
+        moveTo(19f, 4f)
+        horizontalLineTo(15.5f)
+        lineTo(14.5f, 3f)
+        horizontalLineTo(9.5f)
+        lineTo(8.5f, 4f)
+        horizontalLineTo(5f)
+        verticalLineTo(6f)
+        horizontalLineTo(19f)
+        verticalLineTo(4f)
+        close()
+    }
+
+    val Edit: ImageVector = buildSvgIcon("Edit") {
+        moveTo(3f, 17.25f)
+        verticalLineTo(21f)
+        horizontalLineTo(6.75f)
+        lineTo(17.81f, 9.94f)
+        lineTo(14.06f, 6.19f)
+        lineTo(3f, 17.25f)
+        close()
+        moveTo(20.71f, 7.04f)
+        curveTo(21.1f, 6.65f, 21.1f, 6.02f, 20.71f, 5.63f)
+        lineTo(18.37f, 3.29f)
+        curveTo(17.98f, 2.9f, 17.35f, 2.9f, 16.96f, 3.29f)
+        lineTo(15.13f, 5.12f)
+        lineTo(18.88f, 8.87f)
+        lineTo(20.71f, 7.04f)
+        close()
+    }
+
+    val Send: ImageVector = buildSvgIcon("Send") {
+        moveTo(2.01f, 21f)
+        lineTo(23f, 12f)
+        lineTo(2.01f, 3f)
+        lineTo(2f, 10f)
+        lineTo(17f, 12f)
+        lineTo(2f, 14f)
+        close()
+    }
+
+    val List: ImageVector = buildSvgIcon("List") {
+        moveTo(3f, 13f)
+        horizontalLineTo(5f)
+        verticalLineTo(11f)
+        horizontalLineTo(3f)
+        verticalLineTo(13f)
+        close()
+        moveTo(3f, 17f)
+        horizontalLineTo(5f)
+        verticalLineTo(15f)
+        horizontalLineTo(3f)
+        verticalLineTo(17f)
+        close()
+        moveTo(3f, 9f)
+        horizontalLineTo(5f)
+        verticalLineTo(7f)
+        horizontalLineTo(3f)
+        verticalLineTo(9f)
+        close()
+        moveTo(7f, 13f)
+        horizontalLineTo(21f)
+        verticalLineTo(11f)
+        horizontalLineTo(7f)
+        verticalLineTo(13f)
+        close()
+        moveTo(7f, 17f)
+        horizontalLineTo(21f)
+        verticalLineTo(15f)
+        horizontalLineTo(7f)
+        verticalLineTo(17f)
+        close()
+        moveTo(7f, 7f)
+        verticalLineTo(9f)
+        horizontalLineTo(21f)
+        verticalLineTo(7f)
+        horizontalLineTo(7f)
+        close()
+    }
+
+    val Favorite: ImageVector = buildSvgIcon("Favorite") {
+        moveTo(12f, 21.35f)
+        lineTo(10.55f, 20.03f)
+        curveTo(5.4f, 15.36f, 2f, 12.28f, 2f, 8.5f)
+        curveTo(2f, 5.42f, 4.42f, 3f, 7.5f, 3f)
+        curveTo(9.24f, 3f, 10.91f, 3.81f, 12f, 5.09f)
+        curveTo(13.09f, 3.81f, 14.76f, 3f, 16.5f, 3f)
+        curveTo(19.58f, 3f, 22f, 5.42f, 22f, 8.5f)
+        curveTo(22f, 12.28f, 18.6f, 15.36f, 13.45f, 20.04f)
+        lineTo(12f, 21.35f)
+        close()
+    }
+
+    val FavoriteBorder: ImageVector = buildSvgIcon("FavoriteBorder") {
+        moveTo(16.5f, 3f)
+        curveTo(14.76f, 3f, 13.09f, 3.81f, 12f, 5.09f)
+        curveTo(10.91f, 3.81f, 9.24f, 3f, 7.5f, 3f)
+        curveTo(4.42f, 3f, 2f, 5.42f, 2f, 8.5f)
+        curveTo(2f, 12.28f, 5.4f, 15.36f, 10.55f, 20.03f)
+        lineTo(12f, 21.35f)
+        lineTo(13.45f, 20.03f)
+        curveTo(18.6f, 15.36f, 22f, 12.28f, 22f, 8.5f)
+        curveTo(22f, 5.42f, 19.58f, 3f, 16.5f, 3f)
+        close()
+        moveTo(12.1f, 18.55f)
+        lineTo(12f, 18.65f)
+        lineTo(11.9f, 18.55f)
+        curveTo(7.14f, 14.24f, 4f, 11.39f, 4f, 8.5f)
+        curveTo(4f, 6.5f, 5.5f, 5f, 7.5f, 5f)
+        curveTo(9.04f, 5f, 10.54f, 5.99f, 11.07f, 7.36f)
+        horizontalLineTo(12.93f)
+        curveTo(13.46f, 5.99f, 14.96f, 5f, 16.5f, 5f)
+        curveTo(18.5f, 5f, 20f, 6.5f, 20f, 8.5f)
+        curveTo(20f, 11.39f, 16.86f, 14.24f, 12.1f, 18.55f)
+        close()
+    }
+
+    val Notifications: ImageVector = buildSvgIcon("Notifications") {
+        moveTo(12f, 22f)
+        curveTo(13.1f, 22f, 14f, 21.1f, 14f, 20f)
+        horizontalLineTo(10f)
+        curveTo(10f, 21.1f, 10.89f, 22f, 12f, 22f)
+        close()
+        moveTo(18f, 16f)
+        verticalLineTo(11f)
+        curveTo(18f, 7.93f, 16.36f, 5.36f, 13.5f, 4.68f)
+        verticalLineTo(4f)
+        curveTo(13.5f, 3.17f, 12.83f, 2.5f, 12f, 2.5f)
+        curveTo(11.17f, 2.5f, 10.5f, 3.17f, 10.5f, 4f)
+        verticalLineTo(4.68f)
+        curveTo(7.63f, 5.36f, 6f, 7.92f, 6f, 11f)
+        verticalLineTo(16f)
+        lineTo(4f, 18f)
+        verticalLineTo(19f)
+        horizontalLineTo(20f)
+        verticalLineTo(18f)
+        lineTo(18f, 16f)
+        close()
+    }
+
+    val Info: ImageVector = buildSvgIcon("Info") {
+        moveTo(12f, 2f)
+        curveTo(6.48f, 2f, 2f, 6.48f, 2f, 12f)
+        curveTo(2f, 17.52f, 6.48f, 22f, 12f, 22f)
+        curveTo(17.52f, 22f, 22f, 17.52f, 22f, 12f)
+        curveTo(22f, 6.48f, 17.52f, 2f, 12f, 2f)
+        close()
+        moveTo(13f, 17f)
+        horizontalLineTo(11f)
+        verticalLineTo(11f)
+        horizontalLineTo(13f)
+        verticalLineTo(17f)
+        close()
+        moveTo(13f, 9f)
+        horizontalLineTo(11f)
+        verticalLineTo(7f)
+        horizontalLineTo(13f)
+        verticalLineTo(9f)
+        close()
+    }
+
+    val Warning: ImageVector = buildSvgIcon("Warning") {
+        moveTo(1f, 21f)
+        horizontalLineTo(23f)
+        lineTo(12f, 2f)
+        lineTo(1f, 21f)
+        close()
+        moveTo(13f, 18f)
+        horizontalLineTo(11f)
+        verticalLineTo(16f)
+        horizontalLineTo(13f)
+        verticalLineTo(18f)
+        close()
+        moveTo(13f, 14f)
+        horizontalLineTo(11f)
+        verticalLineTo(10f)
+        horizontalLineTo(13f)
+        verticalLineTo(14f)
+        close()
+    }
+
+    val Refresh: ImageVector = buildSvgIcon("Refresh") {
+        moveTo(17.65f, 6.35f)
+        curveTo(16.2f, 4.9f, 14.21f, 4f, 12f, 4f)
+        curveTo(7.58f, 4f, 4.01f, 7.58f, 4.01f, 12f)
+        curveTo(4.01f, 16.42f, 7.58f, 20f, 12f, 20f)
+        curveTo(15.73f, 20f, 18.84f, 17.45f, 19.73f, 14f)
+        horizontalLineTo(17.65f)
+        curveTo(16.83f, 16.33f, 14.61f, 18f, 12f, 18f)
+        curveTo(8.69f, 18f, 6f, 15.31f, 6f, 12f)
+        curveTo(6f, 8.69f, 8.69f, 6f, 12f, 6f)
+        curveTo(13.66f, 6f, 15.14f, 6.69f, 16.22f, 7.78f)
+        lineTo(13f, 11f)
+        horizontalLineTo(20f)
+        verticalLineTo(4f)
+        lineTo(17.65f, 6.35f)
+        close()
+    }
+
+    val Share: ImageVector = buildSvgIcon("Share") {
+        moveTo(18f, 16.08f)
+        curveTo(17.24f, 16.08f, 16.56f, 16.38f, 16.04f, 16.85f)
+        lineTo(8.91f, 12.7f)
+        curveTo(8.96f, 12.47f, 9f, 12.24f, 9f, 12f)
+        curveTo(9f, 11.76f, 8.96f, 11.53f, 8.91f, 11.3f)
+        lineTo(15.96f, 7.19f)
+        curveTo(16.5f, 7.69f, 17.21f, 8f, 18f, 8f)
+        curveTo(19.66f, 8f, 21f, 6.66f, 21f, 5f)
+        curveTo(21f, 3.34f, 19.66f, 2f, 18f, 2f)
+        curveTo(16.34f, 2f, 15f, 3.34f, 15f, 5f)
+        curveTo(15f, 5.24f, 15.04f, 5.47f, 15.09f, 5.7f)
+        lineTo(8.04f, 9.81f)
+        curveTo(7.5f, 9.31f, 6.79f, 9f, 6f, 9f)
+        curveTo(4.34f, 9f, 3f, 10.34f, 3f, 12f)
+        curveTo(3f, 13.66f, 4.34f, 15f, 6f, 15f)
+        curveTo(6.79f, 15f, 7.5f, 14.69f, 8.04f, 14.19f)
+        lineTo(15.16f, 18.34f)
+        curveTo(15.11f, 18.55f, 15.08f, 18.77f, 15.08f, 19f)
+        curveTo(15.08f, 20.61f, 16.39f, 21.92f, 18f, 21.92f)
+        curveTo(19.61f, 21.92f, 20.92f, 20.61f, 20.92f, 19f)
+        curveTo(20.92f, 17.39f, 19.61f, 16.08f, 18f, 16.08f)
+        close()
+    }
+
+    val DateRange: ImageVector = buildSvgIcon("DateRange") {
+        moveTo(9f, 11f)
+        horizontalLineTo(7f)
+        verticalLineTo(13f)
+        horizontalLineTo(9f)
+        verticalLineTo(11f)
+        close()
+        moveTo(13f, 11f)
+        horizontalLineTo(11f)
+        verticalLineTo(13f)
+        horizontalLineTo(13f)
+        verticalLineTo(11f)
+        close()
+        moveTo(17f, 11f)
+        horizontalLineTo(15f)
+        verticalLineTo(13f)
+        horizontalLineTo(17f)
+        verticalLineTo(11f)
+        close()
+        moveTo(19f, 4f)
+        horizontalLineTo(18f)
+        verticalLineTo(2f)
+        horizontalLineTo(16f)
+        verticalLineTo(4f)
+        horizontalLineTo(8f)
+        verticalLineTo(2f)
+        horizontalLineTo(6f)
+        verticalLineTo(4f)
+        horizontalLineTo(5f)
+        curveTo(3.89f, 4f, 3.01f, 4.9f, 3.01f, 6f)
+        lineTo(3f, 20f)
+        curveTo(3f, 21.1f, 3.89f, 22f, 5f, 22f)
+        horizontalLineTo(19f)
+        curveTo(20.1f, 22f, 21f, 21.1f, 21f, 20f)
+        verticalLineTo(6f)
+        curveTo(21f, 4.9f, 20.1f, 4f, 19f, 4f)
+        close()
+        moveTo(19f, 20f)
+        horizontalLineTo(5f)
+        verticalLineTo(9f)
+        horizontalLineTo(19f)
+        verticalLineTo(20f)
+        close()
+    }
+
+    val ThumbUp: ImageVector = buildSvgIcon("ThumbUp") {
+        moveTo(1f, 21f)
+        horizontalLineTo(5f)
+        verticalLineTo(9f)
+        horizontalLineTo(1f)
+        verticalLineTo(21f)
+        close()
+        moveTo(23f, 10f)
+        curveTo(23f, 8.9f, 22.1f, 8f, 21f, 8f)
+        horizontalLineTo(14.69f)
+        lineTo(15.64f, 3.43f)
+        lineTo(15.67f, 3.11f)
+        curveTo(15.67f, 2.7f, 15.5f, 2.32f, 15.23f, 2.05f)
+        lineTo(14.17f, 1f)
+        lineTo(7.59f, 7.59f)
+        curveTo(7.22f, 7.95f, 7f, 8.45f, 7f, 9f)
+        verticalLineTo(19f)
+        curveTo(7f, 20.1f, 7.9f, 21f, 9f, 21f)
+        horizontalLineTo(18f)
+        curveTo(18.83f, 21f, 19.54f, 20.5f, 19.84f, 19.78f)
+        lineTo(22.86f, 12.73f)
+        curveTo(22.95f, 12.5f, 23f, 12.26f, 23f, 12f)
+        verticalLineTo(10f)
+        close()
+    }
 
     fun getVectorForCategoryOrEmoji(iconStr: String?, categoryType: String = "PRODUCT"): ImageVector {
         val str = iconStr?.lowercase() ?: ""
         return when {
-            str.contains("car") || str.contains("garage") || str.contains("wash") || str.contains("🚗") -> Icons.Default.Place
-            str.contains("phone") || str.contains("charger") || str.contains("mobile") || str.contains("📱") || str.contains("🔌") -> Icons.Default.Phone
-            str.contains("service") || str.contains("repair") || str.contains("gear") || str.contains("⚙") || str.contains("🔧") -> Icons.Default.Settings
-            str.contains("food") || str.contains("rice") || str.contains("spoon") || str.contains("restaurant") || str.contains("🍚") || str.contains("🥄") || str.contains("🍔") -> Icons.Default.Place
-            str.contains("job") || str.contains("work") || str.contains("briefcase") || str.contains("💼") -> Icons.Default.Place
-            str.contains("offer") || str.contains("promo") || str.contains("discount") || str.contains("tag") || str.contains("🏷") || str.contains("🎁") -> Icons.Default.Star
-            str.contains("shop") || str.contains("store") || str.contains("business") || str.contains("🏢") || str.contains("🏪") -> Icons.Default.Home
-            str.contains("cart") || str.contains("checkout") || str.contains("🛒") -> Icons.Default.ShoppingCart
-            str.contains("deliver") || str.contains("truck") || str.contains("🚚") -> Icons.Default.ShoppingCart
-            str.contains("location") || str.contains("pin") || str.contains("map") || str.contains("📍") || str.contains("🗺") -> Icons.Default.LocationOn
-            str.contains("user") || str.contains("profile") || str.contains("person") || str.contains("👤") -> Icons.Default.Person
-            categoryType.equals("SERVICE", ignoreCase = true) -> Icons.Default.Settings
-            categoryType.equals("BUSINESS", ignoreCase = true) -> Icons.Default.Home
-            else -> Icons.Default.ShoppingCart
+            str.contains("car") || str.contains("garage") || str.contains("wash") || str.contains("🚗") -> Work
+            str.contains("phone") || str.contains("charger") || str.contains("mobile") || str.contains("📱") || str.contains("🔌") -> Phone
+            str.contains("service") || str.contains("repair") || str.contains("gear") || str.contains("⚙") || str.contains("🔧") -> Build
+            str.contains("food") || str.contains("rice") || str.contains("spoon") || str.contains("restaurant") || str.contains("🍚") || str.contains("🥄") || str.contains("🍔") -> ShoppingCart
+            str.contains("job") || str.contains("work") || str.contains("briefcase") || str.contains("💼") -> Work
+            str.contains("offer") || str.contains("promo") || str.contains("discount") || str.contains("tag") || str.contains("🏷") || str.contains("🎁") -> LocalOffer
+            str.contains("shop") || str.contains("store") || str.contains("business") || str.contains("🏢") || str.contains("🏪") -> Storefront
+            str.contains("cart") || str.contains("checkout") || str.contains("🛒") -> ShoppingCart
+            str.contains("deliver") || str.contains("truck") || str.contains("🚚") -> ShoppingCart
+            str.contains("location") || str.contains("pin") || str.contains("map") || str.contains("📍") || str.contains("🗺") -> LocationOn
+            str.contains("user") || str.contains("profile") || str.contains("person") || str.contains("👤") -> Person
+            categoryType.equals("SERVICE", ignoreCase = true) -> Build
+            categoryType.equals("BUSINESS", ignoreCase = true) -> Storefront
+            else -> ShoppingCart
         }
     }
 }

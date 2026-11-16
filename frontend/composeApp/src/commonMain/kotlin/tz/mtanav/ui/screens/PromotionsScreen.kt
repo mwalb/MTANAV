@@ -1,11 +1,14 @@
 package tz.mtanav.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,14 +18,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import tz.mtanav.model.PromotionDto
 import tz.mtanav.network.MtanavRepository
 import tz.mtanav.theme.*
+import tz.mtanav.ui.components.AppThumbnail
+import tz.mtanav.ui.components.MtanavIcons
+import tz.mtanav.util.FormattingUtils
+import tz.mtanav.util.UrgencyLevel
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PromotionsScreen(
     repository: MtanavRepository,
@@ -94,40 +101,52 @@ fun PromotionsScreen(
                     .padding(horizontal = 16.dp, vertical = 14.dp)
             ) {
                 TextButton(onClick = onBackClicked) {
-                    Text("← Back", color = Accent, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(MtanavIcons.ArrowBack, contentDescription = "Back", tint = Accent, modifier = Modifier.size(16.dp))
+                        Text("Back", color = Accent, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    }
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text("PROMOTIONS & DISCOUNTS", fontSize = 18.sp, fontWeight = FontWeight.Black, color = Surface)
-                    Text("Genuine deals and verified offers from local businesses", fontSize = 12.sp, color = Surface.copy(alpha = 0.8f))
+                    Text("Genuine deals and verified offers from local businesses", fontSize = 12.sp, color = Surface.copy(alpha = 0.85f))
                 }
             }
         }
 
-        // CONTENT
-        Column(
+        // CONTENT CONTAINER WITH RESPONSIVE BREAKPOINTS
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // SEARCH & CATEGORY FILTER CARD
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                        val isNarrow = maxWidth < 600.dp
-                        if (isNarrow) {
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            val isDesktop = maxWidth >= 1024.dp
+            val isTablet = maxWidth >= 640.dp && maxWidth < 1024.dp
+            val isMobile = maxWidth < 640.dp
+
+            val gridColumns = if (isDesktop) 3 else if (isTablet) 2 else 1
+
+            Column(modifier = Modifier.fillMaxSize()) {
+                // SEARCH & CATEGORY FILTER CARD
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        // STACKED ON MOBILE (<640px), SIDE-BY-SIDE ON TABLET/DESKTOP
+                        if (isMobile) {
+                            Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                                 OutlinedTextField(
                                     value = searchQuery,
                                     onValueChange = { searchQuery = it },
                                     placeholder = { Text("Search offers by product, service or business...", fontSize = 13.sp) },
                                     singleLine = true,
-                                    modifier = Modifier.fillMaxWidth(),
+                                    modifier = Modifier.fillMaxWidth().heightIn(min = 44.dp),
                                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Primary)
                                 )
 
@@ -135,9 +154,11 @@ fun PromotionsScreen(
                                     onClick = { fetchPromotions() },
                                     colors = ButtonDefaults.buttonColors(containerColor = Action),
                                     shape = RoundedCornerShape(8.dp),
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth().height(44.dp)
                                 ) {
-                                    Text("SEARCH OFFERS", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                    Icon(MtanavIcons.Search, contentDescription = null, modifier = Modifier.size(16.dp), tint = Surface)
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("SEARCH OFFERS", fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                 }
                             }
                         } else {
@@ -158,124 +179,141 @@ fun PromotionsScreen(
                                 Button(
                                     onClick = { fetchPromotions() },
                                     colors = ButtonDefaults.buttonColors(containerColor = Action),
-                                    shape = RoundedCornerShape(8.dp)
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.height(52.dp)
                                 ) {
-                                    Text("SEARCH OFFERS", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                    Icon(MtanavIcons.Search, contentDescription = null, modifier = Modifier.size(16.dp), tint = Surface)
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("SEARCH OFFERS", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                }
+                            }
+                        }
+
+                        // HORIZONTAL SCROLLABLE CATEGORIES PILLS
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text("Category:", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .horizontalScroll(rememberScrollState())
+                                    .padding(vertical = 2.dp)
+                            ) {
+                                categories.forEach { cat ->
+                                    val isSel = (cat == "All Offers" && selectedCategory == null) || (cat == selectedCategory)
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(20.dp))
+                                            .background(if (isSel) Primary else PrimaryLight)
+                                            .clickable {
+                                                selectedCategory = if (cat == "All Offers") null else cat
+                                                fetchPromotions()
+                                            }
+                                            .padding(horizontal = 14.dp, vertical = 7.dp)
+                                    ) {
+                                        Text(
+                                            text = cat,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isSel) Surface else PrimaryDark
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        // HORIZONTAL SCROLLABLE OFFER TYPES PILLS
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text("Offer Type:", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                            val offerTypes = listOf("All" to null, "Discount" to "DISCOUNT", "Flash Sale" to "FLASH_SALE", "Special Offer" to "SPECIAL_OFFER")
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .horizontalScroll(rememberScrollState())
+                                    .padding(vertical = 2.dp)
+                            ) {
+                                offerTypes.forEach { (label, type) ->
+                                    val isSel = (type == null && selectedOfferType == null) || (selectedOfferType == type)
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(if (isSel) Action else Surface)
+                                            .border(1.dp, if (isSel) Action else Border, RoundedCornerShape(8.dp))
+                                            .clickable {
+                                                selectedOfferType = type
+                                                fetchPromotions()
+                                            }
+                                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                                    ) {
+                                        Text(label, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (isSel) Surface else TextPrimary)
+                                    }
                                 }
                             }
                         }
                     }
+                }
 
-                    // CATEGORIES
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.fillMaxWidth()
+                // STATES
+                if (isLoading) {
+                    Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = Primary)
+                    }
+                } else if (errorMessage != null) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = ErrorRed.copy(alpha = 0.1f)),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
                     ) {
-                        categories.forEach { cat ->
-                            val isSel = (cat == "All Offers" && selectedCategory == null) || (cat == selectedCategory)
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .background(if (isSel) Primary else PrimaryLight)
-                                    .clickable {
-                                        selectedCategory = if (cat == "All Offers") null else cat
-                                        fetchPromotions()
-                                    }
-                                    .padding(horizontal = 12.dp, vertical = 6.dp)
-                            ) {
-                                Text(
-                                    text = cat,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (isSel) Surface else PrimaryDark
-                                )
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(errorMessage ?: "", color = ErrorRed, fontSize = 13.sp)
+                            Button(onClick = { fetchPromotions() }, colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)) {
+                                Text("Retry", fontSize = 12.sp)
                             }
                         }
                     }
-
-                    // OFFER TYPES
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                } else if (promotions.isEmpty()) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Surface),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp)
                     ) {
-                        Text("Type:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
-                        listOf("All" to null, "Discount" to "DISCOUNT", "Flash Sale" to "FLASH_SALE", "Special Offer" to "SPECIAL_OFFER").forEach { (label, type) ->
-                            val isSel = selectedOfferType == type
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(6.dp))
-                                    .background(if (isSel) Action else Surface)
-                                    .clickable {
-                                        selectedOfferType = type
-                                        fetchPromotions()
-                                    }
-                                    .padding(horizontal = 10.dp, vertical = 4.dp)
-                            ) {
-                                Text(label, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (isSel) Surface else TextPrimary)
-                            }
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(MtanavIcons.LocalOffer, contentDescription = null, tint = Action, modifier = Modifier.size(36.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("No active promotions matching your filter.", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                            Text("Check back soon for new deals & discounts from verified shops.", fontSize = 12.sp, color = TextSecondary)
                         }
                     }
-                }
-            }
+                } else {
+                    // DYNAMIC RESULT COUNT HEADING
+                    Text(
+                        text = "${promotions.size} active promotional offers found",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextSecondary,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
 
-            // STATES
-            if (isLoading) {
-                Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Primary)
-                }
-            } else if (errorMessage != null) {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = ErrorRed.copy(alpha = 0.1f)),
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                    // RESPONSIVE GRID (1 col mobile, 2 col tablet, 3 col desktop)
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(gridColumns),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        Text(errorMessage ?: "", color = ErrorRed, fontSize = 13.sp)
-                        Button(onClick = { fetchPromotions() }, colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)) {
-                            Text("Retry", fontSize = 12.sp)
+                        items(promotions) { promo ->
+                            PromotionCardItem(
+                                promo = promo,
+                                onCardClicked = { onPromotionSelected(promo.id) },
+                                onViewShopClicked = { onViewShopClicked(promo.businessId, promo.productId, promo.serviceId) }
+                            )
                         }
-                    }
-                }
-            } else if (promotions.isEmpty()) {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = Surface),
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(tz.mtanav.ui.components.MtanavIcons.LocalOffer, contentDescription = null, tint = Action, modifier = Modifier.size(36.dp))
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("No active promotions matching your filter.", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                        Text("Check back soon for new offers from verified shops.", fontSize = 12.sp, color = TextSecondary)
-                    }
-                }
-            } else {
-                Text(
-                    text = "${promotions.size} active promotional offers found",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextSecondary,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 300.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(promotions) { promo ->
-                        PromotionCardItem(
-                            promo = promo,
-                            onCardClicked = { onPromotionSelected(promo.id) },
-                            onViewShopClicked = { onViewShopClicked(promo.businessId, promo.productId, promo.serviceId) }
-                        )
                     }
                 }
             }
@@ -289,99 +327,151 @@ private fun PromotionCardItem(
     onCardClicked: () -> Unit,
     onViewShopClicked: () -> Unit
 ) {
+    val expiryTag = FormattingUtils.getUrgencyTag(promo.expiryDate, isDeadline = false)
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onCardClicked)
+        modifier = Modifier.fillMaxWidth().fillMaxHeight().clickable(onClick = onCardClicked)
     ) {
-        Column {
-            // SPONSORED BADGE HEADER & DISCOUNT BANNER
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Primary)
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                // TOP BAR WITH SPONSORED & DISCOUNT BANNER
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Primary)
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
                 ) {
-                    if (promo.isSponsored) {
-                        Surface(shape = RoundedCornerShape(4.dp), color = Accent) {
-                            Text("SPONSORED", fontSize = 9.sp, fontWeight = FontWeight.Black, color = TextPrimary, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (promo.isSponsored) {
+                            Surface(shape = RoundedCornerShape(4.dp), color = Accent) {
+                                Text("SPONSORED", fontSize = 9.sp, fontWeight = FontWeight.Black, color = TextPrimary, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                            }
+                        } else {
+                            Text(promo.category, fontSize = 11.sp, color = Surface.copy(alpha = 0.9f), fontWeight = FontWeight.Bold)
                         }
-                    } else {
-                        Text(promo.category, fontSize = 11.sp, color = Surface.copy(alpha = 0.9f), fontWeight = FontWeight.Bold)
+
+                        if (promo.discountPercentage != null && promo.discountPercentage > 0) {
+                            Surface(shape = RoundedCornerShape(4.dp), color = Action) {
+                                Text("${promo.discountPercentage}% OFF", fontSize = 10.sp, fontWeight = FontWeight.Black, color = Surface, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                            }
+                        }
+                    }
+                }
+
+                // COMPACT PRODUCT IMAGE THUMBNAIL / VISUAL HEADER
+                AppThumbnail(
+                    imageUrl = promo.imageUrl,
+                    fallbackIcon = promo.category,
+                    categoryType = promo.category,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(110.dp),
+                    shape = RoundedCornerShape(0.dp)
+                )
+
+                Column(modifier = Modifier.padding(16.dp)) {
+                    // BUSINESS NAME WITH VERIFIED BADGE
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = promo.businessName ?: "Verified Business",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Action
+                        )
+                        Icon(
+                            MtanavIcons.CheckCircle,
+                            contentDescription = "Verified",
+                            tint = SuccessGreen,
+                            modifier = Modifier.size(13.dp)
+                        )
                     }
 
-                    if (promo.discountPercentage != null && promo.discountPercentage > 0) {
-                        Surface(shape = RoundedCornerShape(4.dp), color = Action) {
-                            Text("${promo.discountPercentage}% OFF", fontSize = 10.sp, fontWeight = FontWeight.Black, color = Surface, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    // TITLE (2-line clamped)
+                    Text(
+                        text = promo.title,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    // DESCRIPTION (2-line clamped)
+                    Text(
+                        text = promo.description,
+                        fontSize = 12.sp,
+                        color = TextSecondary,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // PRICES & EXPIRY URGENCY TAG
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column {
+                            promo.promotionalPrice?.let { promoPrice ->
+                                Text(
+                                    text = FormattingUtils.formatTsh(promoPrice),
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = Action
+                                )
+                            }
+                            promo.originalPrice?.let { origPrice ->
+                                Text(
+                                    text = FormattingUtils.formatTsh(origPrice),
+                                    fontSize = 12.sp,
+                                    color = TextSecondary,
+                                    textDecoration = TextDecoration.LineThrough
+                                )
+                            }
+                        }
+
+                        expiryTag?.let { tag ->
+                            val (badgeBg, badgeFg) = when (tag.level) {
+                                UrgencyLevel.EXPIRED -> Pair(ErrorRed.copy(alpha = 0.15f), ErrorRed)
+                                UrgencyLevel.URGENT -> Pair(Accent.copy(alpha = 0.2f), Warning)
+                                UrgencyLevel.NORMAL -> Pair(PrimaryLight, PrimaryDark)
+                            }
+                            Surface(shape = RoundedCornerShape(4.dp), color = badgeBg) {
+                                Text(
+                                    text = tag.label,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = badgeFg,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
 
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = promo.businessName ?: "Verified Business",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Action
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = promo.title,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary,
-                    maxLines = 2
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = promo.description,
-                    fontSize = 12.sp,
-                    color = TextSecondary,
-                    maxLines = 2
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // PRICES
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column {
-                        promo.promotionalPrice?.let { promoPrice ->
-                            Text(
-                                text = "TSh ${promoPrice.toInt()}",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Black,
-                                color = Action
-                            )
-                        }
-                        promo.originalPrice?.let { origPrice ->
-                            Text(
-                                text = "TSh ${origPrice.toInt()}",
-                                fontSize = 12.sp,
-                                color = TextSecondary,
-                                textDecoration = TextDecoration.LineThrough
-                            )
-                        }
-                    }
-
-                    promo.expiryDate?.let { exp ->
-                        Text("Expires: $exp", fontSize = 11.sp, color = TextSecondary, fontWeight = FontWeight.Medium)
-                    }
-                }
-
-                HorizontalDivider(color = Border, modifier = Modifier.padding(vertical = 12.dp))
-
+            // EQUAL-HEIGHT HORIZONTALLY ALIGNED BUTTONS AT BOTTOM
+            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                HorizontalDivider(color = Border, modifier = Modifier.padding(bottom = 12.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -389,7 +479,8 @@ private fun PromotionCardItem(
                     OutlinedButton(
                         onClick = onViewShopClicked,
                         shape = RoundedCornerShape(6.dp),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f).height(38.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp)
                     ) {
                         Text("View Shop", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Primary)
                     }
@@ -398,7 +489,8 @@ private fun PromotionCardItem(
                         onClick = onCardClicked,
                         colors = ButtonDefaults.buttonColors(containerColor = Primary),
                         shape = RoundedCornerShape(6.dp),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f).height(38.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp)
                     ) {
                         Text("View Offer", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     }

@@ -34,7 +34,6 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
 
-            implementation("io.github.alexzhirkevich:compottie:1.1.1")
 
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
@@ -80,4 +79,29 @@ tasks.register("wasmJsBrowserDevelopmentRun") {
     group = "kotlin browser"
     description = "Alias to launch development webpack server"
     dependsOn("jsBrowserDevelopmentRun")
+}
+
+// Automatically extract the matching skiko.js and skiko.wasm from the project's
+// Skiko dependency into jsMain/resources so runtime WASM bindings are 100% in sync.
+val unpackSkikoTask = tasks.register("unpackSkiko") {
+    doLast {
+        val skikoJar = configurations.findByName("jsCompileClasspath")?.files?.find {
+            it.name.contains("skiko") && (it.name.endsWith(".jar") || it.name.endsWith(".klib"))
+        }
+        if (skikoJar != null) {
+            copy {
+                from(zipTree(skikoJar))
+                into(file("src/jsMain/resources"))
+                include("skiko.js", "skiko.wasm")
+                include("**/skiko.js", "**/skiko.wasm")
+                eachFile {
+                    path = name
+                }
+            }
+        }
+    }
+}
+
+tasks.matching { it.name.contains("ProcessResources") || it.name.contains("Webpack") }.configureEach {
+    dependsOn(unpackSkikoTask)
 }

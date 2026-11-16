@@ -22,12 +22,13 @@ fun BusinessRegistrationScreen(
     repository: MtanavRepository,
     onSubmittedSuccess: () -> Unit,
     onBackClicked: () -> Unit,
+    initialBusinessType: String = "Shop / Products",
     modifier: Modifier = Modifier
 ) {
     var step by remember { mutableStateOf(1) } // 1: Info, 2: Location Form, 3: Photos/Review
 
     var businessName by remember { mutableStateOf("") }
-    var businessType by remember { mutableStateOf("Shop") } // Shop, Service, Both
+    var businessType by remember(initialBusinessType) { mutableStateOf(initialBusinessType) } // Shop / Products, Service Provider, Both Shop & Service
     var description by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var whatsapp by remember { mutableStateOf("") }

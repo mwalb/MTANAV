@@ -27,9 +27,12 @@ class AndroidNativeMapController(
 
     fun attachGoogleMap(map: GoogleMap) {
         this.googleMap = map
-        googleMap?.uiSettings?.isZoomControlsEnabled = true
-        googleMap?.uiSettings?.isMyLocationButtonEnabled = true
-        googleMap?.uiSettings?.isCompassEnabled = true
+        googleMap?.uiSettings?.apply {
+            isZoomControlsEnabled = false
+            isMyLocationButtonEnabled = false
+            isCompassEnabled = false
+            isMapToolbarEnabled = false
+        }
 
         googleMap?.setInfoWindowAdapter(object : GoogleMap.InfoWindowAdapter {
             override fun getInfoWindow(marker: Marker): android.view.View? = null
@@ -44,15 +47,15 @@ class AndroidNativeMapController(
                 }
 
                 val titleView = TextView(context).apply {
-                    text = business?.name ?: marker.title ?: ""
-                    textSize = 15f
-                    setTextColor(Color.parseColor("#172033"))
+                    text = "${business?.name ?: marker.title ?: ""}  [✓ VERIFIED]"
+                    textSize = 14f
+                    setTextColor(Color.parseColor("#114B3F"))
                     setTypeface(null, android.graphics.Typeface.BOLD)
                 }
                 layout.addView(titleView)
 
                 val detailsText = if (business != null) {
-                    "⭐ ${business.rating} (${business.reviewCount}) • ${business.address}"
+                    "⭐ ${business.rating} (${business.reviewCount} reviews) • ${business.address}"
                 } else {
                     marker.snippet ?: ""
                 }
@@ -60,20 +63,28 @@ class AndroidNativeMapController(
                     text = detailsText
                     textSize = 12f
                     setTextColor(Color.parseColor("#667085"))
-                    setPadding(0, 4, 0, 8)
+                    setPadding(0, 4, 0, 6)
                 }
                 layout.addView(subtitleView)
 
-                business?.matchingProduct?.let { match ->
-                    val matchView = TextView(context).apply {
-                        text = "Matching: $match"
-                        textSize = 12f
-                        setTextColor(Color.parseColor("#123B6D"))
-                        setTypeface(null, android.graphics.Typeface.BOLD)
-                        setPadding(0, 0, 0, 8)
-                    }
-                    layout.addView(matchView)
+                val topItemsText = when (business?.id) {
+                    1L -> "🏷️ Top: Spoons from TSh 2,800 • Kyela Rice from TSh 3,500"
+                    2L -> "🏷️ Top: Phones from TSh 2.4M • Chargers from TSh 25,000"
+                    3L -> "🏷️ Top: Pans from TSh 18,000 • Shoes from TSh 35,000"
+                    4L -> "🏷️ Top: Service from TSh 80,000 • Car Wash from TSh 15,000"
+                    5L -> "🏷️ Top: Phone Repair from TSh 35,000"
+                    6L -> "🏷️ Top: Leather Shoes from TSh 45,000"
+                    7L -> "🏷️ Top: Hair Salon from TSh 25,000"
+                    else -> business?.matchingProduct?.let { "🏷️ Top: $it" } ?: "🏷️ Top: Verified Shop Items"
                 }
+                val topItemsView = TextView(context).apply {
+                    text = topItemsText
+                    textSize = 11.5f
+                    setTextColor(Color.parseColor("#114B3F"))
+                    setTypeface(null, android.graphics.Typeface.BOLD)
+                    setPadding(0, 0, 0, 8)
+                }
+                layout.addView(topItemsView)
 
                 val actionHintView = TextView(context).apply {
                     text = "Tap window to View Shop"

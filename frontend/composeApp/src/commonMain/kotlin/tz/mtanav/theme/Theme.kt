@@ -6,11 +6,11 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-val Primary = Color(0xFF176B65)
-val PrimaryDark = Color(0xFF124E4A)
+val Primary = Color(0xFF114B3F)
+val PrimaryDark = Color(0xFF0A332B)
 val PrimaryLight = Color(0xFFE4F3F0)
 val Action = Color(0xFF2D8A68)
-val Accent = Color(0xFFE8AD4A)
+val Accent = Color(0xFFF5A623)
 val Background = Color(0xFFF7F8F5)
 val Surface = Color(0xFFFFFFFF)
 val TextPrimary = Color(0xFF24332F)
@@ -21,9 +21,9 @@ val Warning = Color(0xFF946313)
 val Error = Color(0xFFB83C42)
 
 val PrimaryDeepBlue = Primary
-val PrimaryBlue = Color(0xFF1E88E5)
-val CampnavDeepBlue = Color(0xFF1A237E)
-val CampnavBlue = Color(0xFF3949AB)
+val PrimaryBlue = Color(0xFF1A6052)
+val CampnavDeepBlue = Primary
+val CampnavBlue = Color(0xFF1A6052)
 val AppBackground = Background
 val SurfaceWhite = Surface
 val ActionTeal = Action

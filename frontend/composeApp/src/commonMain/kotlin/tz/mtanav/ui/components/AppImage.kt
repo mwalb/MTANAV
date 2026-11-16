@@ -48,3 +48,21 @@ fun AppThumbnail(
         )
     }
 }
+
+@Composable
+fun AppImage(
+    imageUrl: String?,
+    fallbackIcon: String = "🏪",
+    categoryType: String = "BUSINESS",
+    contentDescription: String? = null,
+    modifier: Modifier = Modifier,
+    shape: Shape = RoundedCornerShape(8.dp)
+) {
+    AppThumbnail(
+        imageUrl = imageUrl,
+        fallbackIcon = fallbackIcon,
+        categoryType = categoryType,
+        modifier = modifier,
+        shape = shape
+    )
+}

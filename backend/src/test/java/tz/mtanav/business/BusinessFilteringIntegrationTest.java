@@ -160,4 +160,19 @@ public class BusinessFilteringIntegrationTest {
         assertThat(results).hasSize(1);
         assertThat(results.get(0).getName()).isEqualTo("Shop B (Rice Seller)");
     }
+
+    @Test
+    @DisplayName("COMBINED FILTERING: Price range and location filtering with AND logic")
+    void testCombinedPriceAndLocationFiltering() {
+        // Shop A sells Spoon for 3000 in Kariakoo
+        // Shop C sells Spoon for 3500 in Sinza
+        List<BusinessMapDto> cheapSpoons = businessService.getMapBusinesses(
+                spoon.getId(), null, null, BigDecimal.valueOf(1000), BigDecimal.valueOf(3200),
+                null, null, null, null, "Dar es Salaam", "Kariakoo", null, true, true, false, false, null, "LOWEST_PRICE"
+        );
+
+        assertThat(cheapSpoons).hasSize(1);
+        assertThat(cheapSpoons.get(0).getName()).isEqualTo("Shop A (Spoon Seller)");
+        assertThat(cheapSpoons.get(0).getStartingPrice()).isEqualByComparingTo(BigDecimal.valueOf(3000));
+    }
 }

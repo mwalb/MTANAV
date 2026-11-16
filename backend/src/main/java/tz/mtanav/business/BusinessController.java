@@ -35,10 +35,18 @@ public class BusinessController {
             @RequestParam(required = false) Double maxDistanceKm,
             @RequestParam(required = false) Double userLat,
             @RequestParam(required = false) Double userLng,
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) String district,
+            @RequestParam(required = false) String area,
+            @RequestParam(required = false) Boolean verifiedOnly,
+            @RequestParam(required = false) Boolean inStockOnly,
+            @RequestParam(required = false) Boolean freeOnly,
+            @RequestParam(required = false) Boolean hasPromotions,
             @RequestParam(required = false) Boolean availableNow,
             @RequestParam(required = false) String sort) {
         return ResponseEntity.ok(ApiResponse.success(businessService.getMapBusinesses(
-                productId, serviceId, query, minPrice, maxPrice, maxDistanceKm, userLat, userLng, availableNow, sort)));
+                productId, serviceId, query, minPrice, maxPrice, minRating, maxDistanceKm, userLat, userLng,
+                region, district, area, verifiedOnly, inStockOnly, freeOnly, hasPromotions, availableNow, sort)));
     }
 
     @GetMapping("/{id}")

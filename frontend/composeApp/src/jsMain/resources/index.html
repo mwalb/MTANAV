@@ -87,11 +87,11 @@
             display: flex;
         }
 
-        /* NATIVE HTML SIDEBAR PANEL */
+        /* NATIVE HTML SIDEBAR PANEL (INCREASED WIDTH TO 360px FOR FULL PRODUCT/SERVICE FILTERING) */
         #native-sidebar-panel {
-            width: 384px;
-            min-width: 384px;
-            max-width: 384px;
+            width: 360px;
+            min-width: 360px;
+            max-width: 360px;
             height: 100%;
             background-color: #124E4A;
             color: #FFFFFF;
@@ -104,9 +104,10 @@
         }
 
         .sidebar-header {
-            padding: 18px 16px 12px 16px;
+            padding: 16px 16px 12px 16px;
             background: #124E4A;
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: relative;
         }
 
         .brand-row {
@@ -116,9 +117,9 @@
         }
 
         .brand-title {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 900;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
             color: #FFFFFF;
             display: flex;
             align-items: center;
@@ -129,7 +130,7 @@
             font-size: 11px;
             color: #E8AD4A;
             margin-top: 2px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             font-weight: 500;
         }
 
@@ -144,59 +145,125 @@
             justify-content: center;
         }
 
+        /* SEARCH INPUT (HEIGHT: 48px) */
         .search-box {
             display: flex;
             align-items: center;
             background: #FFFFFF;
             border-radius: 10px;
-            padding: 8px 12px;
+            padding: 0 12px;
+            height: 48px;
+            min-height: 48px;
             margin-top: 6px;
+            position: relative;
         }
 
         .search-icon {
             display: flex;
             align-items: center;
             margin-right: 8px;
+            color: #64748B;
+            flex-shrink: 0;
         }
 
         #sidebar-search-input {
             border: none;
             outline: none;
             width: 100%;
-            font-size: 12px;
+            height: 100%;
+            font-size: 14px;
+            font-weight: 500;
             color: #0F172A;
             background: transparent;
+        }
+
+        /* LIVE SEARCH AUTO-COMPLETE DROPDOWN */
+        #search-suggestions-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            width: 100%;
+            background: #FFFFFF;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            z-index: 500;
+            display: none;
+            max-height: 220px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        .suggestion-item {
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #0F172A;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #F1F5F9;
+            transition: background 0.15s ease;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background: #F1F5F9;
+            color: #176B65;
+        }
+
+        .suggestion-type {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #E4F3F0;
+            color: #176B65;
         }
 
         .sidebar-content {
             flex: 1;
             overflow-y: auto;
-            padding: 16px;
+            padding: 14px 16px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
+        }
+
+        .sidebar-view-panel {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
         }
 
         .section-label {
-            font-size: 10px;
+            font-size: 10.5px;
             font-weight: 800;
             letter-spacing: 1px;
             color: rgba(255,255,255,0.65);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
+        /* MAIN NAVIGATION ITEMS (HEIGHT: 48px) */
         .menu-item {
             display: flex;
             align-items: center;
-            background: rgba(23, 107, 101, 0.45);
-            padding: 12px;
+            background: rgba(23, 107, 101, 0.55);
+            padding: 10px 14px;
+            height: 48px;
+            min-height: 48px;
             border-radius: 10px;
+            margin-bottom: 8px;
             cursor: pointer;
             transition: background 0.2s ease, transform 0.1s ease;
         }
 
         .menu-item:hover {
-            background: rgba(23, 107, 101, 0.75);
+            background: rgba(23, 107, 101, 0.85);
             transform: translateX(2px);
         }
 
@@ -205,36 +272,417 @@
             align-items: center;
             justify-content: center;
             margin-right: 12px;
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
         }
 
         .menu-text {
             flex: 1;
+            overflow: hidden;
         }
 
         .menu-title {
-            font-size: 13px;
+            font-size: 14.5px;
             font-weight: 700;
             color: #FFFFFF;
         }
 
         .menu-desc {
-            font-size: 10.5px;
+            font-size: 11px;
             color: rgba(255,255,255,0.8);
             margin-top: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .menu-arrow {
             display: flex;
             align-items: center;
             color: rgba(255,255,255,0.6);
+            flex-shrink: 0;
         }
 
         .earn-banner {
-            background: rgba(232, 173, 74, 0.15);
+            background: rgba(232, 173, 74, 0.18);
             border: 1px solid rgba(232, 173, 74, 0.6);
-            margin-top: 8px;
+            margin-top: 4px;
+        }
+
+        /* BACK BUTTON (HEIGHT: 44px) */
+        .sidebar-back-btn {
+            height: 44px;
+            min-height: 44px;
+            padding: 0 14px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            border: none;
+            color: #E8AD4A;
+            font-size: 13.5px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 12px;
+            transition: background 0.2s ease;
+        }
+
+        .sidebar-back-btn:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        /* PRODUCT & SERVICE LIST ITEMS (CLEAN NO-ICON FULL WIDTH CARDS) */
+        .list-item {
+            min-height: 52px;
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .list-item:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: #E8AD4A;
+            transform: translateX(2px);
+        }
+
+        .item-text {
+            flex: 1;
+            overflow: hidden;
+            margin-right: 8px;
+        }
+
+        .item-title {
+            font-size: 14.5px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .item-desc {
+            font-size: 11.5px;
+            color: rgba(255,255,255,0.8);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ACTIVE FILTER HEADER & COMPONENT STYLING */
+        .active-item-header {
+            background: rgba(23, 107, 101, 0.7);
+            border: 1px solid rgba(232, 173, 74, 0.6);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .active-item-title {
+            font-size: 15px;
+            font-weight: 900;
+            color: #FFFFFF;
+        }
+
+        .active-item-badge {
+            font-size: 10px;
+            font-weight: 800;
+            background: #E8AD4A;
+            color: #124E4A;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-form-body {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .filter-group-card {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .filter-group-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #E8AD4A;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .filter-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .filter-input, .filter-select {
+            width: 100%;
+            height: 44px;
+            min-height: 44px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #FFFFFF;
+            font-size: 13.5px;
+            padding: 0 10px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .filter-input:focus, .filter-select:focus {
+            border-color: #E8AD4A;
+        }
+
+        .filter-select option {
+            background: #124E4A;
+            color: #FFFFFF;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .flex-1 {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .geo-location-btn {
+            width: 100%;
+            height: 44px;
+            background: #E8AD4A;
+            color: #124E4A;
+            border: none;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: opacity 0.2s ease;
+        }
+
+        .geo-location-btn:hover {
+            opacity: 0.9;
+        }
+
+        .geo-status-text {
+            font-size: 11.5px;
+            color: #E8AD4A;
+            margin-top: 2px;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        .quick-price-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 2px;
+            width: 100%;
+        }
+
+        .price-chip {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #FFFFFF;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .price-chip:hover, .price-chip.active {
+            background: #E8AD4A;
+            color: #124E4A;
+            border-color: #E8AD4A;
+            font-weight: 800;
+        }
+
+        .filter-checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 2px 0;
+            width: 100%;
+        }
+
+        .filter-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: #E8AD4A;
+            cursor: pointer;
+        }
+
+        .filter-checkbox-label {
+            font-size: 12.5px;
+            color: #FFFFFF;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .filter-action-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-top: 12px;
+            margin-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            width: 100%;
+        }
+
+        .btn-apply-filters {
+            width: 100%;
+            height: 48px;
+            min-height: 48px;
+            background-color: #E8AD4A;
+            color: #124E4A;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(232, 173, 74, 0.3);
+            transition: transform 0.1s ease, opacity 0.2s ease;
+        }
+
+        .btn-apply-filters:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        .btn-clear-filters {
+            width: 100%;
+            height: 44px;
+            min-height: 44px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+
+        .btn-clear-filters:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .item-text {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .item-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .item-desc {
+            font-size: 11.5px;
+            color: rgba(255,255,255,0.75);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ACTIVE FILTER BANNER */
+        .active-filter-banner {
+            background: rgba(232, 173, 74, 0.2);
+            border: 1px solid #E8AD4A;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .filter-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: #FFFFFF;
+        }
+
+        .filter-sub {
+            font-size: 11px;
+            color: #E8AD4A;
+            margin-top: 2px;
+        }
+
+        /* LOADING & ERROR STATES */
+        .sidebar-state-box {
+            padding: 24px 16px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+        }
+
+        .sidebar-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #E8AD4A;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .sidebar-footer {
@@ -250,7 +698,7 @@
             border: none;
             border-radius: 8px;
             padding: 12px;
-            font-size: 13px;
+            font-size: 13.5px;
             font-weight: 800;
             cursor: pointer;
             display: flex;
@@ -261,7 +709,7 @@
         }
 
         .auth-btn:hover {
-            opacity: 0.9f;
+            opacity: 0.9;
         }
 
         /* NATIVE GOOGLE MAP CANVAS */
@@ -276,6 +724,9 @@
                 position: absolute;
                 top: 0;
                 left: 0;
+                width: 85vw;
+                min-width: 300px;
+                max-width: 360px;
                 height: 100%;
                 transform: translateX(-100%);
                 z-index: 300;
@@ -337,106 +788,292 @@
 
                     <div class="search-box">
                         <span class="search-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
                         </span>
                         <input type="text" id="sidebar-search-input" placeholder="Search products &amp; services..." />
+                        <div id="search-suggestions-dropdown"></div>
                     </div>
                 </div>
 
                 <div class="sidebar-content">
-                    <div class="section-label">EXPLORE CATEGORIES</div>
+                    <!-- VIEW 1: MAIN CATEGORIES -->
+                    <div id="view-categories" class="sidebar-view-panel">
+                        <div class="section-label">EXPLORE CATEGORIES</div>
 
-                    <div class="menu-item" id="nav-products">
-                        <span class="menu-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                                <line x1="3" y1="6" x2="21" y2="6"></line>
-                                <path d="M16 10a4 4 0 0 1-8 0"></path>
-                            </svg>
-                        </span>
-                        <div class="menu-text">
-                            <div class="menu-title">Products</div>
-                            <div class="menu-desc">Spoons, rice, phones, chargers, shoes</div>
+                        <div class="menu-item" id="nav-products">
+                            <span class="menu-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                </svg>
+                            </span>
+                            <div class="menu-text">
+                                <div class="menu-title">Products</div>
+                                <div class="menu-desc">Spoons, rice, phones, chargers, shoes</div>
+                            </div>
+                            <span class="menu-arrow">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </span>
                         </div>
-                        <span class="menu-arrow">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                        </span>
+
+                        <div class="menu-item" id="nav-services">
+                            <span class="menu-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                </svg>
+                            </span>
+                            <div class="menu-text">
+                                <div class="menu-title">Services</div>
+                                <div class="menu-desc">Garage, car wash, salon, phone repair</div>
+                            </div>
+                            <span class="menu-arrow">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </span>
+                        </div>
+
+                        <div class="menu-item" id="nav-promotions">
+                            <span class="menu-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                                </svg>
+                            </span>
+                            <div class="menu-text">
+                                <div class="menu-title">Promotions</div>
+                                <div class="menu-desc">Flash sales, discounts &amp; genuine deals</div>
+                            </div>
+                            <span class="menu-arrow">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </span>
+                        </div>
+
+                        <div class="menu-item" id="nav-jobs">
+                            <span class="menu-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                </svg>
+                            </span>
+                            <div class="menu-text">
+                                <div class="menu-title">Local Jobs</div>
+                                <div class="menu-desc">Delivery, sales, technical &amp; trade work</div>
+                            </div>
+                            <span class="menu-arrow">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </span>
+                        </div>
+
+                        <div class="menu-item earn-banner" id="nav-earn">
+                            <span class="menu-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                            </span>
+                            <div class="menu-text">
+                                <div class="menu-title">Want to earn with MTANAV?</div>
+                                <div class="menu-desc">Referrals &amp; creator rewards</div>
+                            </div>
+                            <span class="menu-arrow">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </span>
+                        </div>
                     </div>
 
-                    <div class="menu-item" id="nav-services">
-                        <span class="menu-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                            </svg>
-                        </span>
-                        <div class="menu-text">
-                            <div class="menu-title">Services</div>
-                            <div class="menu-desc">Garage, car wash, salon, phone repair</div>
-                        </div>
-                        <span class="menu-arrow">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                        </span>
+                    <!-- VIEW 2: PRODUCTS LIST VIEW -->
+                    <div id="view-products" class="sidebar-view-panel" style="display: none;">
+                        <button class="sidebar-back-btn" id="products-back-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                            Back to Main Categories
+                        </button>
+                        <div class="section-label">ALL PRODUCTS</div>
+                        <div id="products-list-container"></div>
                     </div>
 
-                    <div class="menu-item" id="nav-promotions">
-                        <span class="menu-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                                <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                            </svg>
-                        </span>
-                        <div class="menu-text">
-                            <div class="menu-title">Promotions</div>
-                            <div class="menu-desc">Flash sales, discounts &amp; genuine deals</div>
-                        </div>
-                        <span class="menu-arrow">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                        </span>
+                    <!-- VIEW 3: SERVICES LIST VIEW -->
+                    <div id="view-services" class="sidebar-view-panel" style="display: none;">
+                        <button class="sidebar-back-btn" id="services-back-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                            Back to Main Categories
+                        </button>
+                        <div class="section-label">ALL SERVICES</div>
+                        <div id="services-list-container"></div>
                     </div>
 
-                    <div class="menu-item" id="nav-jobs">
-                        <span class="menu-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                            </svg>
-                        </span>
-                        <div class="menu-text">
-                            <div class="menu-title">Local Jobs</div>
-                            <div class="menu-desc">Delivery, sales, technical &amp; trade work</div>
-                        </div>
-                        <span class="menu-arrow">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                        </span>
-                    </div>
+                    <!-- VIEW 4: PRODUCT & SERVICE ADVANCED FILTERING INTERFACE -->
+                    <div id="view-filter-results" class="sidebar-view-panel" style="display: none;">
+                        <button class="sidebar-back-btn" id="filter-back-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                            <span id="filter-back-label">Back</span>
+                        </button>
 
-                    <div class="menu-item earn-banner" id="nav-earn">
-                        <span class="menu-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                            </svg>
-                        </span>
-                        <div class="menu-text">
-                            <div class="menu-title">Want to earn with MTANAV?</div>
-                            <div class="menu-desc">Referrals &amp; creator rewards</div>
+                        <div class="active-item-header" id="active-item-header">
+                            <div class="active-item-title" id="filter-item-name">Selected Item</div>
+                            <div class="active-item-badge" id="filter-item-badge">DISCOVERY</div>
                         </div>
-                        <span class="menu-arrow">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                        </span>
+
+                        <div class="filter-form-body">
+                            <!-- LOCATION & DISTANCE -->
+                            <div class="filter-group-card">
+                                <div class="filter-group-title">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    Location &amp; Distance
+                                </div>
+
+                                <button type="button" class="geo-location-btn" id="btn-use-my-location">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#124E4A" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polygon points="12 8 8 12 12 16 12 8"></polygon></svg>
+                                    <span id="geo-btn-label">Use My Current Location</span>
+                                </button>
+                                <div id="geo-location-status" class="geo-status-text" style="display:none;"></div>
+
+                                <div class="filter-field">
+                                    <label class="filter-label" for="filter-region">Region</label>
+                                    <select id="filter-region" class="filter-select">
+                                        <option value="">All Regions</option>
+                                        <option value="Dar es Salaam" selected>Dar es Salaam</option>
+                                        <option value="Arusha">Arusha</option>
+                                        <option value="Mwanza">Mwanza</option>
+                                        <option value="Dodoma">Dodoma</option>
+                                        <option value="Zanzibar">Zanzibar</option>
+                                        <option value="Kilimanjaro">Kilimanjaro</option>
+                                        <option value="Tanga">Tanga</option>
+                                        <option value="Morogoro">Morogoro</option>
+                                        <option value="Mbeya">Mbeya</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-field">
+                                    <label class="filter-label" for="filter-district">District</label>
+                                    <select id="filter-district" class="filter-select">
+                                        <option value="">All Districts</option>
+                                        <option value="Kinondoni">Kinondoni</option>
+                                        <option value="Ilala">Ilala</option>
+                                        <option value="Temeke">Temeke</option>
+                                        <option value="Ubungo">Ubungo</option>
+                                        <option value="Kigamboni">Kigamboni</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-field">
+                                    <label class="filter-label" for="filter-area">Neighbourhood / Area</label>
+                                    <input type="text" id="filter-area" class="filter-input" placeholder="e.g. Kariakoo, Sinza, Posta, Masaki..." />
+                                </div>
+
+                                <div class="filter-field">
+                                    <label class="filter-label" for="filter-distance">Distance Radius</label>
+                                    <select id="filter-distance" class="filter-select">
+                                        <option value="">Any distance</option>
+                                        <option value="1">Within 1 km</option>
+                                        <option value="3">Within 3 km</option>
+                                        <option value="5">Within 5 km</option>
+                                        <option value="10">Within 10 km</option>
+                                        <option value="20">Within 20 km</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- PRICE & SORTING -->
+                            <div class="filter-group-card">
+                                <div class="filter-group-title">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                    Price in TZS &amp; Sorting
+                                </div>
+
+                                <div class="filter-row">
+                                    <div class="filter-field flex-1">
+                                        <label class="filter-label" for="filter-min-price">Min Price (TZS)</label>
+                                        <input type="number" id="filter-min-price" class="filter-input" placeholder="Min TSh" min="0" />
+                                    </div>
+                                    <div class="filter-field flex-1">
+                                        <label class="filter-label" for="filter-max-price">Max Price (TZS)</label>
+                                        <input type="number" id="filter-max-price" class="filter-input" placeholder="Max TSh" min="0" />
+                                    </div>
+                                </div>
+
+                                <div class="quick-price-chips">
+                                    <button type="button" class="price-chip" data-min="" data-max="5000">&lt; 5k TSh</button>
+                                    <button type="button" class="price-chip" data-min="5000" data-max="20000">5k-20k TSh</button>
+                                    <button type="button" class="price-chip" data-min="20000" data-max="50000">20k-50k TSh</button>
+                                    <button type="button" class="price-chip" data-min="50000" data-max="">&gt; 50k TSh</button>
+                                </div>
+
+                                <div class="filter-field">
+                                    <label class="filter-label" for="filter-sort">Sort Order</label>
+                                    <select id="filter-sort" class="filter-select">
+                                        <option value="">Default (Relevance)</option>
+                                        <option value="LOWEST_PRICE">Lowest price first</option>
+                                        <option value="HIGHEST_PRICE">Highest price first</option>
+                                        <option value="HIGHEST_RATED">Highest rated first</option>
+                                        <option value="NEAREST">Nearest location first</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-checkbox-row" id="container-free-services" style="display:none;">
+                                    <input type="checkbox" id="filter-free-only" class="filter-checkbox" />
+                                    <label for="filter-free-only" class="filter-checkbox-label">Free services only</label>
+                                </div>
+                            </div>
+
+                            <!-- ADDITIONAL PREFERENCES -->
+                            <div class="filter-group-card">
+                                <div class="filter-group-title">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8AD4A" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                    Additional Preferences
+                                </div>
+
+                                <div class="filter-checkbox-row" id="container-in-stock">
+                                    <input type="checkbox" id="filter-in-stock" class="filter-checkbox" checked />
+                                    <label for="filter-in-stock" class="filter-checkbox-label">Available in stock only</label>
+                                </div>
+
+                                <div class="filter-checkbox-row">
+                                    <input type="checkbox" id="filter-verified-only" class="filter-checkbox" checked />
+                                    <label for="filter-verified-only" class="filter-checkbox-label">Verified businesses only</label>
+                                </div>
+
+                                <div class="filter-checkbox-row">
+                                    <input type="checkbox" id="filter-has-promotions" class="filter-checkbox" />
+                                    <label for="filter-has-promotions" class="filter-checkbox-label">Promotions &amp; discounts</label>
+                                </div>
+
+                                <div class="filter-field">
+                                    <label class="filter-label" for="filter-min-rating">Minimum Rating</label>
+                                    <select id="filter-min-rating" class="filter-select">
+                                        <option value="">Any rating</option>
+                                        <option value="3.0">⭐ 3.0+ Stars</option>
+                                        <option value="4.0">⭐ 4.0+ Stars</option>
+                                        <option value="4.5">⭐ 4.5+ Stars</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="filter-action-footer">
+                            <button type="button" id="btn-apply-filters" class="btn-apply-filters">
+                                APPLY FILTERS
+                            </button>
+                            <button type="button" id="btn-clear-filters" class="btn-clear-filters">
+                                CLEAR FILTERS
+                            </button>
+                        </div>
+
+                        <!-- Filter Results Container -->
+                        <div id="filter-results-container" style="margin-top:12px;"></div>
                     </div>
                 </div>
 

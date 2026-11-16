@@ -42,7 +42,7 @@ public class BusinessService {
 
     @Transactional(readOnly = true)
     public List<BusinessMapDto> getMapBusinesses(Long productId, Long serviceId, String query) {
-        return getMapBusinesses(productId, serviceId, query, null, null, null, null, null, null, null);
+        return getMapBusinesses(productId, serviceId, query, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     @Transactional(readOnly = true)
@@ -55,6 +55,29 @@ public class BusinessService {
             Double maxDistanceKm,
             Double userLat,
             Double userLng,
+            Boolean availableNow,
+            String sort) {
+        return getMapBusinesses(productId, serviceId, query, minPrice, maxPrice, null, maxDistanceKm, userLat, userLng, null, null, null, null, null, null, null, availableNow, sort);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BusinessMapDto> getMapBusinesses(
+            Long productId,
+            Long serviceId,
+            String query,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Double minRating,
+            Double maxDistanceKm,
+            Double userLat,
+            Double userLng,
+            String region,
+            String district,
+            String area,
+            Boolean verifiedOnly,
+            Boolean inStockOnly,
+            Boolean freeOnly,
+            Boolean hasPromotions,
             Boolean availableNow,
             String sort) {
 
@@ -86,7 +109,11 @@ public class BusinessService {
                 }
             }
         } else {
-            businesses = businessRepository.findByVerificationStatus(VerificationStatus.VERIFIED);
+            if (Boolean.FALSE.equals(verifiedOnly)) {
+                businesses = businessRepository.findAll();
+            } else {
+                businesses = businessRepository.findByVerificationStatus(VerificationStatus.VERIFIED);
+            }
         }
 
         final String finalItemName = matchingItemName;
@@ -94,13 +121,28 @@ public class BusinessService {
                 .map(b -> mapToBusinessMapDto(b, productId, serviceId, finalItemName))
                 .collect(Collectors.toList());
 
-        // Apply budget & distance filters (NO rating filter)
+        // Apply filters with AND logic
         dtoList = dtoList.stream().filter(dto -> {
-            if (minPrice != null && dto.getStartingPrice() != null && dto.getStartingPrice().compareTo(minPrice) < 0) {
-                return false;
+            if (minPrice != null) {
+                if (dto.getStartingPrice() == null || dto.getStartingPrice().compareTo(minPrice) < 0) {
+                    return false;
+                }
             }
-            if (maxPrice != null && dto.getStartingPrice() != null && dto.getStartingPrice().compareTo(maxPrice) > 0) {
-                return false;
+            if (maxPrice != null) {
+                if (dto.getStartingPrice() == null || dto.getStartingPrice().compareTo(maxPrice) > 0) {
+                    return false;
+                }
+            }
+            if (Boolean.TRUE.equals(freeOnly)) {
+                if (dto.getStartingPrice() != null && dto.getStartingPrice().compareTo(BigDecimal.ZERO) > 0) {
+                    return false;
+                }
+            }
+            if (minRating != null) {
+                double rating = dto.getRating() != null ? dto.getRating() : 0.0;
+                if (rating < minRating) {
+                    return false;
+                }
             }
             if (maxDistanceKm != null && userLat != null && userLng != null) {
                 double dist = calculateDistanceKm(userLat, userLng, dto.getLatitude(), dto.getLongitude());
@@ -108,11 +150,36 @@ public class BusinessService {
                     return false;
                 }
             }
+            if (region != null && !region.trim().isEmpty() && !region.equalsIgnoreCase("All Regions")) {
+                String reqRegion = region.trim().toLowerCase();
+                String bRegion = dto.getCity() != null ? dto.getCity().toLowerCase() : "";
+                String bAddress = dto.getAddress() != null ? dto.getAddress().toLowerCase() : "";
+                if (!bRegion.contains(reqRegion) && !bAddress.contains(reqRegion)) {
+                    return false;
+                }
+            }
+            if (district != null && !district.trim().isEmpty() && !district.equalsIgnoreCase("All Districts")) {
+                String reqDistrict = district.trim().toLowerCase();
+                String bAddress = dto.getAddress() != null ? dto.getAddress().toLowerCase() : "";
+                String bCity = dto.getCity() != null ? dto.getCity().toLowerCase() : "";
+                if (!bAddress.contains(reqDistrict) && !bCity.contains(reqDistrict)) {
+                    return false;
+                }
+            }
+            if (area != null && !area.trim().isEmpty()) {
+                String reqArea = area.trim().toLowerCase();
+                String bAddress = dto.getAddress() != null ? dto.getAddress().toLowerCase() : "";
+                String bBuilding = dto.getBuildingName() != null ? dto.getBuildingName().toLowerCase() : "";
+                String bShop = dto.getShopNumber() != null ? dto.getShopNumber().toLowerCase() : "";
+                if (!bAddress.contains(reqArea) && !bBuilding.contains(reqArea) && !bShop.contains(reqArea)) {
+                    return false;
+                }
+            }
             return true;
         }).collect(Collectors.toList());
 
         // Apply sorting
-        if (sort != null) {
+        if (sort != null && !sort.trim().isEmpty()) {
             switch (sort.toUpperCase()) {
                 case "LOWEST_PRICE":
                     dtoList.sort((a, b) -> {
@@ -120,6 +187,14 @@ public class BusinessService {
                         if (a.getStartingPrice() == null) return 1;
                         if (b.getStartingPrice() == null) return -1;
                         return a.getStartingPrice().compareTo(b.getStartingPrice());
+                    });
+                    break;
+                case "HIGHEST_PRICE":
+                    dtoList.sort((a, b) -> {
+                        if (a.getStartingPrice() == null && b.getStartingPrice() == null) return 0;
+                        if (a.getStartingPrice() == null) return 1;
+                        if (b.getStartingPrice() == null) return -1;
+                        return b.getStartingPrice().compareTo(a.getStartingPrice());
                     });
                     break;
                 case "HIGHEST_RATING":
